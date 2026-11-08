@@ -140,7 +140,7 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
       page.getByRole("button", { name: "New playground", exact: true }),
     ).toBeVisible();
     await page
-      .getByRole("button", { name: "Connections", exact: true })
+      .getByRole("link", { name: "Connections", exact: true })
       .click();
     await page
       .getByRole("button", { name: "Add connection", exact: true })
@@ -225,12 +225,16 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
     await expect(
       page.getByText("Saved playground", { exact: true }),
     ).toBeVisible();
+    // Saving gives the playground its own address.
+    await expect(page).toHaveURL(/\/playgrounds\/[\w-]+$/);
+    const playgroundUrl = page.url();
     await page
       .getByRole("button", { name: "Run questions", exact: true })
       .click();
     await expect(page.getByText("Completed", { exact: true })).toBeVisible();
     await expect(page.locator(".answer-block")).toHaveCount(4);
     await expect(page.locator(".result-box")).toBeVisible();
+    await expect(page).toHaveURL(playgroundUrl);
     expect(requests).toHaveLength(1);
     expect(requests[0].headers.authorization).toBe(
       "Bearer test-secret-never-returned",
@@ -280,7 +284,7 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
       animations: "disabled",
     });
     // Icon-only controls retain their accessible names and active-page state.
-    const connectionsNav = desktopSidebar.getByRole("button", {
+    const connectionsNav = desktopSidebar.getByRole("link", {
       name: "Connections",
       exact: true,
     });
@@ -290,7 +294,7 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
     await expect(
       page.getByRole("heading", { name: "Connections", exact: true }),
     ).toBeVisible();
-    const playgroundNav = desktopSidebar.getByRole("button", {
+    const playgroundNav = desktopSidebar.getByRole("link", {
       name: "Playground",
       exact: true,
     });
@@ -367,7 +371,7 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
       .getByRole("button", { name: "Open navigation", exact: true })
       .click();
     await expect(
-      page.getByRole("button", { name: "Run history", exact: true }),
+      page.getByRole("link", { name: "Run history", exact: true }),
     ).toBeVisible();
     const mobileNavigation = page.getByRole("dialog", {
       name: "Workspace navigation",
@@ -381,7 +385,7 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
     }).toBe(true);
     expect(
       await mobileNavigation
-        .getByRole("button", { name: "Run history", exact: true })
+        .getByRole("link", { name: "Run history", exact: true })
         .innerText(),
     ).toContain("Run history");
     await page.screenshot({
@@ -403,23 +407,43 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
     ).toBe(375);
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page
-      .getByRole("button", { name: "Run history", exact: true })
+      .getByRole("link", { name: "Run history", exact: true })
       .click();
     await expect(page.locator(".history-row")).toHaveCount(1);
     await page.locator(".history-main").click();
     await expect(page.locator(".answer-block")).toHaveCount(4);
+    await expect(page).toHaveURL(/\/runs\/[\w-]+$/);
+    const runUrl = page.url();
     await page.reload();
     await expect(page.locator("html")).toHaveClass(/\blight\b/);
     await expect(application).toHaveAttribute("data-sidebar-collapsed", "true");
     await expect(
       page.getByRole("button", { name: "Expand sidebar", exact: true }),
     ).toBeVisible();
+    // A run's address reopens its inputs and results.
+    await expect(page).toHaveURL(runUrl);
+    await expect(page.getByLabel("Playground title")).toHaveValue(
+      "Product listing review",
+    );
+    await expect(page.locator(".answer-block")).toHaveCount(4);
     await expect(
-      page.getByRole("button", { name: "Product listing review", exact: true }),
+      page.getByRole("link", { name: "Product listing review", exact: true }),
     ).toBeVisible();
     await page
-      .getByRole("button", { name: "Product listing review", exact: true })
+      .getByRole("link", { name: "Product listing review", exact: true })
       .click();
+    await expect(page).toHaveURL(playgroundUrl);
+    // A saved playground's address survives a reload.
+    await page.reload();
+    await expect(page.getByLabel("Playground title")).toHaveValue(
+      "Product listing review",
+    );
+    await expect(
+      page.getByText("Saved playground", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Product listing review", exact: true }),
+    ).toHaveAttribute("aria-current", "page");
     await expect(modelPicker).toHaveText("jev-test");
     providerFailure = true;
     await page
@@ -431,8 +455,15 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
     ).toBeVisible();
     providerFailure = false;
     await page
-      .getByRole("button", { name: "Administration", exact: true })
+      .getByRole("link", { name: "Administration", exact: true })
       .click();
+    await expect(page).toHaveURL(/\/admin$/);
+    // Back returns to the playground as it was, failed run included.
+    await page.goBack();
+    await expect(page).toHaveURL(playgroundUrl);
+    await expect(page.getByText("Failed", { exact: true })).toBeVisible();
+    await page.goForward();
+    await expect(page).toHaveURL(/\/admin$/);
     await page
       .getByRole("button", { name: "Create account", exact: true })
       .click();
@@ -451,7 +482,7 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
       page.getByRole("heading", { name: "Test Member", exact: true }),
     ).toBeVisible();
     await page
-      .getByRole("button", { name: "Connections", exact: true })
+      .getByRole("link", { name: "Connections", exact: true })
       .click();
     await page
       .getByRole("button", { name: "Add connection", exact: true })
@@ -489,16 +520,33 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
       member.getByRole("button", { name: "New playground", exact: true }),
     ).toBeVisible();
     await expect(
-      member.getByRole("button", { name: "Administration", exact: true }),
+      member.getByRole("link", { name: "Administration", exact: true }),
     ).toHaveCount(0);
     await expect(
-      member.getByRole("button", {
+      member.getByRole("link", {
         name: "Product listing review",
         exact: true,
       }),
     ).toHaveCount(0);
+    // Another user's addresses open nothing of theirs.
+    await member.goto(playgroundUrl);
+    await expect(
+      member.getByText("Playground not found.", { exact: true }),
+    ).toBeVisible();
+    await expect(member).toHaveURL("http://127.0.0.1:4176/");
+    await expect(member.getByLabel("Playground title")).toHaveValue(
+      "Untitled playground",
+    );
+    await member.goto(runUrl);
+    await expect(
+      member.getByText("Run not found.", { exact: true }),
+    ).toBeVisible();
+    await expect(member).toHaveURL(/\/runs$/);
+    await expect(
+      member.getByText("No runs yet.", { exact: true }),
+    ).toBeVisible();
     await member
-      .getByRole("button", { name: "Connections", exact: true })
+      .getByRole("link", { name: "Connections", exact: true })
       .click();
     await expect(
       member.getByRole("heading", {
@@ -514,13 +562,13 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
     ).toHaveCount(0);
     expect(await member.content()).not.toContain("shared-test-key");
     await member
-      .getByRole("button", { name: "Run history", exact: true })
+      .getByRole("link", { name: "Run history", exact: true })
       .click();
     await expect(
       member.getByText("No runs yet.", { exact: true }),
     ).toBeVisible();
     await member
-      .getByRole("button", { name: "Connections", exact: true })
+      .getByRole("link", { name: "Connections", exact: true })
       .click();
     await member
       .getByRole("button", { name: "Add connection", exact: true })
@@ -581,6 +629,9 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
       .click();
     await expect(member.getByText("Completed", { exact: true })).toBeVisible();
     await expect(member.locator(".answer-block")).toHaveCount(3);
+    // An unsaved draft's run takes the run's address, so a reload keeps it.
+    await expect(member).toHaveURL(/\/runs\/[\w-]+$/);
+    const memberRunUrl = member.url();
     const clefRequest = requests.at(-1)!;
     expect(clefRequest.url).toBe(
       "/client/v4/accounts/test-account/ai/run/@cf/cloudflare/clef",
@@ -613,6 +664,17 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
       .getByRole("button", { name: "Switch to dark theme", exact: true })
       .click();
     await expect(member.locator("html")).toHaveClass(/\bdark\b/);
+    // Signing in from a saved address opens what it names.
+    await member.goto(memberRunUrl);
+    await member
+      .getByLabel("Email", { exact: true })
+      .fill("member@example.test");
+    await member
+      .getByLabel("Password", { exact: true })
+      .fill("member-test-password-123");
+    await member.getByRole("button", { name: "Sign in", exact: true }).click();
+    await expect(member).toHaveURL(memberRunUrl);
+    await expect(member.locator(".answer-block")).toHaveCount(3);
     await memberContext.close();
     expect(errors).toEqual([]);
   } finally {

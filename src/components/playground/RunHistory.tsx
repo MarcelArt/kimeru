@@ -1,4 +1,5 @@
-import { History, LoaderCircle, Trash2 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { History, Trash2 } from "lucide-react";
 import { Button } from "#/components/ui/button";
 import { Badge } from "#/components/ui/badge";
 import {
@@ -13,13 +14,9 @@ import { formatDate } from "./shared";
 
 export function RunHistory({
   runs,
-  loadingRun,
-  onOpenRun,
   onDeleteRun,
 }: {
   runs: RunSummary[];
-  loadingRun: string;
-  onOpenRun: (id: string) => void;
   onDeleteRun: (run: RunSummary) => void;
 }) {
   return (
@@ -47,10 +44,10 @@ export function RunHistory({
         <div className="history-list">
           {runs.map((item) => (
             <article className="history-row" key={item.id}>
-              <button
+              <Link
                 className="history-main"
-                onClick={() => onOpenRun(item.id)}
-                disabled={!!loadingRun}
+                to="/runs/$runId"
+                params={{ runId: item.id }}
               >
                 <div>
                   <h2>{item.title}</h2>
@@ -61,7 +58,7 @@ export function RunHistory({
                   </p>
                 </div>
                 <span>{formatDate(item.createdAt)}</span>
-              </button>
+              </Link>
               <Badge
                 variant={item.status === "error" ? "destructive" : "outline"}
               >
@@ -76,11 +73,7 @@ export function RunHistory({
                 aria-label={`Delete run ${item.title}`}
                 onClick={() => onDeleteRun(item)}
               >
-                {loadingRun === item.id ? (
-                  <LoaderCircle className="animate-spin" />
-                ) : (
-                  <Trash2 />
-                )}
+                <Trash2 />
               </Button>
             </article>
           ))}

@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Link, linkOptions, useNavigate } from "@tanstack/react-router";
 import {
   FlaskConical,
   History,
@@ -39,13 +40,7 @@ import { Field, FieldGroup, FieldLabel } from "#/components/ui/field";
 import { ToggleGroup, ToggleGroupItem } from "#/components/ui/toggle-group";
 import { cn } from "#/lib/utils";
 import { DEFAULT_MODELS } from "#/lib/domain";
-import type {
-  Bootstrap,
-  DecisionInput,
-  Playground,
-  Run,
-  Workspace,
-} from "#/lib/domain";
+import type { Bootstrap, DecisionInput, Run, Workspace } from "#/lib/domain";
 import {
   getBootstrap,
   getWorkspace,
@@ -66,8 +61,13 @@ import { Administration, PasswordDialog } from "./Administration";
 import { Modal, Picker, errorMessage, downloadJson } from "./shared";
 import { prepareImage } from "./images";
 import { ThemeToggle } from "./ThemeToggle";
+import {
+  editorLink,
+  sourceKey,
+  useWorkspacePage,
+  type EditorSource,
+} from "./routing";
 
-type View = "playground" | "history" | "connections" | "admin";
 function blankInput(workspace: Workspace | null): DecisionInput {
   const connection = workspace?.connections[0];
   return {
@@ -80,6 +80,9 @@ function blankInput(workspace: Workspace | null): DecisionInput {
     images: [],
   };
 }
+function findPlayground(workspace: Workspace | null, id: string) {
+  return workspace?.playgrounds.find((playground) => playground.id === id);
+}
 
 export function App({
   initialBootstrap,
@@ -88,19 +91,44 @@ export function App({
   initialBootstrap: Bootstrap;
   initialWorkspace: Workspace | null;
 }) {
+  const navigate = useNavigate();
+  const page = useWorkspacePage();
+  const routeSource = page.view === "playground" ? page.source : null;
+  const routeKey = routeSource && sourceKey(routeSource);
   const [bootstrap, setBootstrap] = useState(initialBootstrap);
   const [workspace, setWorkspace] = useState(initialWorkspace);
-  const [draft, setDraft] = useState<DecisionInput>(() =>
-    blankInput(initialWorkspace),
+  // A saved playground named in the URL opens in the first render, so the
+  // server-rendered page already shows it.
+  const [editorSource, setEditorSourceState] = useState<EditorSource>(() =>
+    routeSource?.kind === "playground" &&
+    findPlayground(initialWorkspace, routeSource.id)
+      ? routeSource
+      : { kind: "new" },
   );
-  const [playgroundId, setPlaygroundId] = useState<string>();
-  const [view, setView] = useState<View>("playground");
+  const [draft, setDraft] = useState<DecisionInput>(() => {
+    const playground =
+      editorSource.kind === "playground" &&
+      findPlayground(initialWorkspace, editorSource.id);
+    return playground
+      ? structuredClone(playground)
+      : blankInput(initialWorkspace);
+  });
+  // A run named in the URL loads after hydration; until then its page shows
+  // a loading state instead of an empty draft.
+  const [openingRun, setOpeningRun] = useState(() =>
+    initialWorkspace && routeSource?.kind === "run" ? routeSource.id : null,
+  );
+  // Read by the URL sync and by async handlers, which must see the latest
+  // values rather than the ones from the render that started them.
+  const editorSourceRef = useRef(editorSource);
+  const routeKeyRef = useRef(routeKey);
+  const playgroundId =
+    editorSource.kind === "playground" ? editorSource.id : undefined;
   const [run, setRun] = useState<Run | null>(null);
   const [stale, setStale] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [running, setRunning] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [loadingRun, setLoadingRun] = useState("");
   const [uploading, setUploading] = useState(false);
   const [models, setModels] = useState<string[]>([]);
   const [discovering, setDiscovering] = useState(false);
@@ -141,6 +169,55 @@ export function App({
     desktop.addEventListener("change", closeOnDesktop);
     return () => desktop.removeEventListener("change", closeOnDesktop);
   }, []);
+  const signedInAs = workspace?.user.id;
+  // Opens what the URL names in the editor. This runs only when the URL or the
+  // signed-in user changes. Actions that change the editor themselves update
+  // editorSourceRef before navigating, so their navigation is a no-op here.
+  useLayoutEffect(() => {
+    routeKeyRef.current = routeKey;
+    if (
+      !routeSource ||
+      !workspace ||
+      routeKey === sourceKey(editorSourceRef.current)
+    )
+      return;
+    if (routeSource.kind === "new") {
+      showEditor(routeSource, blankInput(workspace));
+      return;
+    }
+    if (routeSource.kind === "playground") {
+      const playground = findPlayground(workspace, routeSource.id);
+      if (playground) showEditor(routeSource, playground);
+      else {
+        toast.error("Playground not found.");
+        void navigate({ to: "/", replace: true });
+      }
+      return;
+    }
+    let current = true;
+    setOpeningRun(routeSource.id);
+    getRun({ data: { id: routeSource.id } })
+      .then((saved) => {
+        if (current) showEditor(routeSource, saved.input, saved);
+      })
+      .catch((error) => {
+        if (!current) return;
+        toast.error(errorMessage(error));
+        void navigate({ to: "/runs", replace: true });
+      })
+      .finally(() => {
+        if (current) setOpeningRun(null);
+      });
+    return () => {
+      current = false;
+      setOpeningRun(null);
+    };
+  }, [routeKey, signedInAs]);
+  const role = workspace?.user.role;
+  useEffect(() => {
+    if (page.view === "admin" && role && role !== "admin")
+      void navigate({ to: "/", replace: true });
+  }, [page.view, role]);
   const connection = workspace?.connections.find(
     (item) => item.id === draft.connectionId,
   );
@@ -184,9 +261,35 @@ export function App({
     setDirty(true);
     if (run) setStale(true);
   }
-  function navigate(next: View) {
-    setView(next);
+  function closeMobileNav() {
     setMobileNav(false);
+  }
+  function setEditorSource(source: EditorSource) {
+    editorSourceRef.current = source;
+    setEditorSourceState(source);
+  }
+  /** Replaces the editor's contents with `input`, identified by `source`. */
+  function showEditor(
+    source: EditorSource,
+    input: DecisionInput,
+    savedRun: Run | null = null,
+  ) {
+    setEditorSource(source);
+    setDraft(structuredClone(input));
+    setRun(savedRun);
+    setStale(false);
+    setDirty(false);
+    setModels([]);
+  }
+  /**
+   * Keeps the editor's contents but gives them a new identity, such as after
+   * saving. If the editor is on screen, its URL changes to match.
+   */
+  function rebindEditor(source: EditorSource) {
+    const onScreen =
+      routeKeyRef.current === sourceKey(editorSourceRef.current);
+    setEditorSource(source);
+    if (onScreen) void navigate({ ...editorLink(source), replace: true });
   }
   function toggleSidebar() {
     const collapsed = !sidebarCollapsed;
@@ -198,31 +301,23 @@ export function App({
     }
   }
   function newPlayground() {
-    setDraft(blankInput(workspace));
-    setPlaygroundId(undefined);
-    setRun(null);
-    setStale(false);
-    setDirty(false);
-    setModels([]);
-    navigate("playground");
-  }
-  function openPlayground(playground: Playground) {
-    setDraft(structuredClone(playground));
-    setPlaygroundId(playground.id);
-    setRun(null);
-    setStale(false);
-    setDirty(false);
-    setModels([]);
-    navigate("playground");
+    showEditor({ kind: "new" }, blankInput(workspace));
+    closeMobileNav();
+    void navigate({ to: "/" });
   }
   async function save() {
     setSaving(true);
+    const startedFor = editorSourceRef.current;
     try {
       const saved = await savePlayground({
         data: { ...draft, id: playgroundId },
       });
-      setPlaygroundId(saved.id);
-      setDirty(false);
+      // Skip if Back or Forward opened something else while saving.
+      if (editorSourceRef.current === startedFor) {
+        if (saved.id !== playgroundId)
+          rebindEditor({ kind: "playground", id: saved.id });
+        setDirty(false);
+      }
       await refresh();
       toast.success("Playground saved");
     } catch (error) {
@@ -267,10 +362,19 @@ export function App({
       return;
     }
     setRunning(true);
+    const startedFor = editorSourceRef.current;
     try {
       const result = await executeRun({ data: draft });
-      setRun(result);
-      setStale(false);
+      // Back or forward can open something else mid-run; these results only
+      // belong to the inputs that were sent.
+      if (editorSourceRef.current === startedFor) {
+        setRun(result);
+        setStale(false);
+        // The run now records an unsaved draft and its results, so the run's
+        // URL reopens both. A saved playground keeps its own URL.
+        if (startedFor.kind !== "playground")
+          rebindEditor({ kind: "run", id: result.id });
+      }
       await refresh();
       if (result.status === "error")
         toast.error(result.error || "The provider request failed.");
@@ -328,7 +432,7 @@ export function App({
       const image = await prepareImage(
         new File([await response.blob()], "mug.jpg", { type: "image/jpeg" }),
       );
-      setDraft({
+      showEditor({ kind: "new" }, {
         ...blankInput(workspace),
         title: "Product listing review",
         stateFormat: "json",
@@ -374,33 +478,14 @@ export function App({
           },
         ],
       });
-      setPlaygroundId(undefined);
-      setRun(null);
-      setStale(false);
       setDirty(true);
-      navigate("playground");
+      closeMobileNav();
+      void navigate({ to: "/" });
       toast(
         "Example inputs loaded. Run with your provider to get real results.",
       );
     } catch (error) {
       toast.error(errorMessage(error));
-    }
-  }
-  async function openRun(id: string) {
-    setLoadingRun(id);
-    try {
-      const saved = await getRun({ data: { id } });
-      setRun(saved);
-      setDraft(structuredClone(saved.input));
-      setPlaygroundId(undefined);
-      setStale(false);
-      setDirty(false);
-      setModels([]);
-      navigate("playground");
-    } catch (error) {
-      toast.error(errorMessage(error));
-    } finally {
-      setLoadingRun("");
     }
   }
   async function remove() {
@@ -410,7 +495,16 @@ export function App({
       if (deleteTarget.kind === "run")
         await deleteRun({ data: { id: deleteTarget.id } });
       else await deletePlayground({ data: { id: deleteTarget.id } });
-      if (deleteTarget.id === playgroundId) newPlayground();
+      const removed = sourceKey(deleteTarget);
+      if (sourceKey(editorSourceRef.current) === removed) {
+        // Its URL no longer opens anything, so the editor becomes a new
+        // draft. A deleted run's inputs stay in it, unsaved.
+        const onScreen = routeKeyRef.current === removed;
+        if (deleteTarget.kind === "playground")
+          showEditor({ kind: "new" }, blankInput(workspace));
+        else setEditorSource({ kind: "new" });
+        if (onScreen) void navigate({ to: "/", replace: true });
+      }
       if (deleteTarget.id === run?.id) setRun(null);
       setDeleteTarget(null);
       await refresh();
@@ -426,9 +520,8 @@ export function App({
       await logout();
       setWorkspace(null);
       setBootstrap({ needsSetup: false, user: null });
-      setDraft(blankInput(null));
-      setRun(null);
-      setPlaygroundId(undefined);
+      showEditor({ kind: "new" }, blankInput(null));
+      void navigate({ to: "/", replace: true });
     } catch (error) {
       toast.error(errorMessage(error));
     }
@@ -439,11 +532,23 @@ export function App({
       <AuthScreen needsSetup={bootstrap.needsSetup} onSignedIn={refresh} />
     );
   const user = workspace.user;
+  // The Playground item returns to whatever the editor holds, unsaved
+  // changes included.
   const navigation = [
-    { id: "playground" as const, title: "Playground", icon: FlaskConical },
-    { id: "history" as const, title: "Run history", icon: History },
-    { id: "connections" as const, title: "Connections", icon: Plug },
+    {
+      title: "Playground",
+      icon: FlaskConical,
+      link: editorLink(editorSource),
+    },
+    { title: "Run history", icon: History, link: linkOptions({ to: "/runs" }) },
+    {
+      title: "Connections",
+      icon: Plug,
+      link: linkOptions({ to: "/connections" }),
+    },
   ];
+  const editorLoading =
+    routeSource?.kind === "run" && openingRun === routeSource.id;
   const navigationContent = (
     <>
       <div className="brand" aria-label="Kimeru">
@@ -472,17 +577,18 @@ export function App({
       </Button>
       <nav className="primary-nav" aria-label="Workspace">
         {navigation.map((item) => (
-          <button
-            className={cn("nav-link", view === item.id && "active")}
-            key={item.id}
-            aria-current={view === item.id ? "page" : undefined}
+          <Link
+            {...item.link}
+            key={item.title}
+            className="nav-link"
+            activeOptions={{ exact: true }}
             aria-label={item.title}
             title={item.title}
-            onClick={() => navigate(item.id)}
+            onClick={closeMobileNav}
           >
             <item.icon />
             <span className="sidebar-label">{item.title}</span>
-          </button>
+          </Link>
         ))}
       </nav>
       <div className="library-label">
@@ -494,26 +600,22 @@ export function App({
             <div
               className={cn(
                 "library-entry",
-                playgroundId === playground.id &&
-                  view === "playground" &&
-                  "active",
+                routeKey === `playground:${playground.id}` && "active",
               )}
               key={playground.id}
             >
-              <button
+              <Link
+                to="/playgrounds/$playgroundId"
+                params={{ playgroundId: playground.id }}
+                activeOptions={{ exact: true }}
                 disabled={running}
-                onClick={() => openPlayground(playground)}
+                onClick={closeMobileNav}
                 title={playground.title}
                 aria-label={playground.title}
-                aria-current={
-                  playgroundId === playground.id && view === "playground"
-                    ? "page"
-                    : undefined
-                }
               >
                 <FileText className="library-icon" aria-hidden="true" />
                 <span className="sidebar-label">{playground.title}</span>
-              </button>
+              </Link>
               <Button
                 variant="ghost"
                 size="icon"
@@ -547,16 +649,17 @@ export function App({
       </button>
       <div className="sidebar-bottom">
         {user.role === "admin" && (
-          <button
-            className={cn("nav-link", view === "admin" && "active")}
+          <Link
+            to="/admin"
+            className="nav-link"
+            activeOptions={{ exact: true }}
             aria-label="Administration"
             title="Administration"
-            aria-current={view === "admin" ? "page" : undefined}
-            onClick={() => navigate("admin")}
+            onClick={closeMobileNav}
           >
             <ShieldCheck />
             <span className="sidebar-label">Administration</span>
-          </button>
+          </Link>
         )}
         <button
           className="nav-link"
@@ -657,11 +760,13 @@ export function App({
             <span className="breadcrumb-parent">Workspace</span>
             <ChevronRight className="breadcrumb-parent" />
             <span>
-              {view === "playground"
-                ? draft.title
-                : view === "history"
+              {page.view === "playground"
+                ? editorLoading
+                  ? "Opening run…"
+                  : draft.title
+                : page.view === "history"
                   ? "Run history"
-                  : view === "connections"
+                  : page.view === "connections"
                     ? "Connections"
                     : "Administration"}
             </span>
@@ -674,23 +779,25 @@ export function App({
             <ThemeToggle />
           </div>
         </header>
-        {view === "connections" ? (
+        {page.view === "connections" ? (
           <Connections
             user={user}
             connections={workspace.connections}
             refresh={refresh}
           />
-        ) : view === "admin" && user.role === "admin" ? (
-          <Administration currentUser={user} />
-        ) : view === "history" ? (
+        ) : page.view === "admin" ? (
+          user.role === "admin" && <Administration currentUser={user} />
+        ) : page.view === "history" ? (
           <RunHistory
             runs={workspace.runs}
-            loadingRun={loadingRun}
-            onOpenRun={openRun}
             onDeleteRun={(item) =>
               setDeleteTarget({ id: item.id, title: item.title, kind: "run" })
             }
           />
+        ) : editorLoading ? (
+          <div className="loading-area" role="status" aria-label="Opening run">
+            <LoaderCircle className="animate-spin" />
+          </div>
         ) : (
           <>
             <div className="playground-heading">
@@ -818,12 +925,8 @@ export function App({
                     <span>
                       Add your first provider connection to run this playground.
                     </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => navigate("connections")}
-                    >
-                      Add connection
+                    <Button variant="outline" size="sm" asChild>
+                      <Link to="/connections">Add connection</Link>
                     </Button>
                   </AlertDescription>
                 </Alert>

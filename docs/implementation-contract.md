@@ -36,7 +36,7 @@ All methods accept the following data through the TanStack server-function `{ da
 
 - Backend: `src/server/api.ts`, `src/server/store.ts`, `src/server/auth.ts`, backend validation helpers and tests.
 - Provider adapter: `src/server/providers.ts`, provider helpers/tests.
-- Interface: `src/components/playground/**`, `src/routes/index.tsx`, `src/styles.css` after shadcn initialization is complete.
+- Interface: `src/components/playground/**`, `src/routes/_workspace/**`, `src/styles.css` after shadcn initialization is complete.
 - Root: shared types, shadcn-generated components, root route, packaging, documentation, integration verification and fixes.
 
 Data storage uses Node's built-in SQLite on Node 24. The runtime data directory defaults to `.data`, configured by `KIMERU_DATA_DIR`. Keys are encrypted at rest with an instance secret persisted outside the database in that directory (or supplied with `KIMERU_ENCRYPTION_KEY`). Run snapshots retain their own immutable inputs/images. Static public assets must never contain user uploads.

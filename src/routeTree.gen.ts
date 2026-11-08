@@ -9,50 +9,186 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as WorkspaceRouteRouteImport } from './routes/_workspace/route'
+import { Route as WorkspaceIndexRouteImport } from './routes/_workspace/index'
+import { Route as WorkspaceAdminRouteImport } from './routes/_workspace/admin'
+import { Route as WorkspaceConnectionsRouteImport } from './routes/_workspace/connections'
+import { Route as WorkspacePlaygroundsPlaygroundIdRouteImport } from './routes/_workspace/playgrounds.$playgroundId'
+import { Route as WorkspaceRunsIndexRouteImport } from './routes/_workspace/runs/index'
+import { Route as WorkspaceRunsRunIdRouteImport } from './routes/_workspace/runs/$runId'
 
-const IndexRoute = IndexRouteImport.update({
+const WorkspaceRouteRoute = WorkspaceRouteRouteImport.update({
+  id: '/_workspace',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorkspaceIndexRoute = WorkspaceIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => WorkspaceRouteRoute,
+} as any)
+const WorkspaceAdminRoute = WorkspaceAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => WorkspaceRouteRoute,
+} as any)
+const WorkspaceConnectionsRoute = WorkspaceConnectionsRouteImport.update({
+  id: '/connections',
+  path: '/connections',
+  getParentRoute: () => WorkspaceRouteRoute,
+} as any)
+const WorkspacePlaygroundsPlaygroundIdRoute =
+  WorkspacePlaygroundsPlaygroundIdRouteImport.update({
+    id: '/playgrounds/$playgroundId',
+    path: '/playgrounds/$playgroundId',
+    getParentRoute: () => WorkspaceRouteRoute,
+  } as any)
+const WorkspaceRunsIndexRoute = WorkspaceRunsIndexRouteImport.update({
+  id: '/runs/',
+  path: '/runs/',
+  getParentRoute: () => WorkspaceRouteRoute,
+} as any)
+const WorkspaceRunsRunIdRoute = WorkspaceRunsRunIdRouteImport.update({
+  id: '/runs/$runId',
+  path: '/runs/$runId',
+  getParentRoute: () => WorkspaceRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof WorkspaceIndexRoute
+  '/admin': typeof WorkspaceAdminRoute
+  '/connections': typeof WorkspaceConnectionsRoute
+  '/playgrounds/$playgroundId': typeof WorkspacePlaygroundsPlaygroundIdRoute
+  '/runs/$runId': typeof WorkspaceRunsRunIdRoute
+  '/runs/': typeof WorkspaceRunsIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/admin': typeof WorkspaceAdminRoute
+  '/connections': typeof WorkspaceConnectionsRoute
+  '/': typeof WorkspaceIndexRoute
+  '/playgrounds/$playgroundId': typeof WorkspacePlaygroundsPlaygroundIdRoute
+  '/runs/$runId': typeof WorkspaceRunsRunIdRoute
+  '/runs': typeof WorkspaceRunsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_workspace': typeof WorkspaceRouteRouteWithChildren
+  '/_workspace/admin': typeof WorkspaceAdminRoute
+  '/_workspace/connections': typeof WorkspaceConnectionsRoute
+  '/_workspace/': typeof WorkspaceIndexRoute
+  '/_workspace/playgrounds/$playgroundId': typeof WorkspacePlaygroundsPlaygroundIdRoute
+  '/_workspace/runs/$runId': typeof WorkspaceRunsRunIdRoute
+  '/_workspace/runs/': typeof WorkspaceRunsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/connections'
+    | '/playgrounds/$playgroundId'
+    | '/runs/$runId'
+    | '/runs/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/admin'
+    | '/connections'
+    | '/'
+    | '/playgrounds/$playgroundId'
+    | '/runs/$runId'
+    | '/runs'
+  id:
+    | '__root__'
+    | '/_workspace'
+    | '/_workspace/admin'
+    | '/_workspace/connections'
+    | '/_workspace/'
+    | '/_workspace/playgrounds/$playgroundId'
+    | '/_workspace/runs/$runId'
+    | '/_workspace/runs/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  WorkspaceRouteRoute: typeof WorkspaceRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_workspace': {
+      id: '/_workspace'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof WorkspaceRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_workspace/': {
+      id: '/_workspace/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof WorkspaceIndexRouteImport
+      parentRoute: typeof WorkspaceRouteRoute
+    }
+    '/_workspace/admin': {
+      id: '/_workspace/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof WorkspaceAdminRouteImport
+      parentRoute: typeof WorkspaceRouteRoute
+    }
+    '/_workspace/connections': {
+      id: '/_workspace/connections'
+      path: '/connections'
+      fullPath: '/connections'
+      preLoaderRoute: typeof WorkspaceConnectionsRouteImport
+      parentRoute: typeof WorkspaceRouteRoute
+    }
+    '/_workspace/playgrounds/$playgroundId': {
+      id: '/_workspace/playgrounds/$playgroundId'
+      path: '/playgrounds/$playgroundId'
+      fullPath: '/playgrounds/$playgroundId'
+      preLoaderRoute: typeof WorkspacePlaygroundsPlaygroundIdRouteImport
+      parentRoute: typeof WorkspaceRouteRoute
+    }
+    '/_workspace/runs/': {
+      id: '/_workspace/runs/'
+      path: '/runs'
+      fullPath: '/runs/'
+      preLoaderRoute: typeof WorkspaceRunsIndexRouteImport
+      parentRoute: typeof WorkspaceRouteRoute
+    }
+    '/_workspace/runs/$runId': {
+      id: '/_workspace/runs/$runId'
+      path: '/runs/$runId'
+      fullPath: '/runs/$runId'
+      preLoaderRoute: typeof WorkspaceRunsRunIdRouteImport
+      parentRoute: typeof WorkspaceRouteRoute
     }
   }
 }
 
+interface WorkspaceRouteRouteChildren {
+  WorkspaceAdminRoute: typeof WorkspaceAdminRoute
+  WorkspaceConnectionsRoute: typeof WorkspaceConnectionsRoute
+  WorkspaceIndexRoute: typeof WorkspaceIndexRoute
+  WorkspacePlaygroundsPlaygroundIdRoute: typeof WorkspacePlaygroundsPlaygroundIdRoute
+  WorkspaceRunsRunIdRoute: typeof WorkspaceRunsRunIdRoute
+  WorkspaceRunsIndexRoute: typeof WorkspaceRunsIndexRoute
+}
+
+const WorkspaceRouteRouteChildren: WorkspaceRouteRouteChildren = {
+  WorkspaceAdminRoute: WorkspaceAdminRoute,
+  WorkspaceConnectionsRoute: WorkspaceConnectionsRoute,
+  WorkspaceIndexRoute: WorkspaceIndexRoute,
+  WorkspacePlaygroundsPlaygroundIdRoute: WorkspacePlaygroundsPlaygroundIdRoute,
+  WorkspaceRunsRunIdRoute: WorkspaceRunsRunIdRoute,
+  WorkspaceRunsIndexRoute: WorkspaceRunsIndexRoute,
+}
+
+const WorkspaceRouteRouteWithChildren = WorkspaceRouteRoute._addFileChildren(
+  WorkspaceRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  WorkspaceRouteRoute: WorkspaceRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -23,7 +23,8 @@ select {
 button {
   cursor: pointer;
 }
-button:disabled {
+button:disabled,
+a[aria-disabled="true"] {
   cursor: not-allowed;
 }
 [data-slot="button"],
@@ -53,11 +54,13 @@ button:disabled {
   min-width: 46px;
   padding: 0 8px;
 }
+a,
 button,
 input,
 textarea {
   -webkit-tap-highlight-color: transparent;
 }
+a:focus-visible,
 button:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
@@ -186,8 +189,9 @@ h2 {
   border-radius: 3px;
   border: 1px solid transparent;
 }
-.library-entry > button:first-child {
+.library-entry > a {
   display: block;
+  align-content: center;
   min-height: var(--control-height);
   flex: 1;
   min-width: 0;
@@ -219,7 +223,7 @@ h2 {
   border-color: var(--border);
   background: var(--background);
 }
-.library-entry.active > button:first-child {
+.library-entry.active > a {
   color: var(--foreground);
 }
 .library-entry:hover {
@@ -1760,7 +1764,7 @@ h2 {
     display: inline-flex;
     opacity: 1;
   }
-  .library-entry > button:first-child,
+  .library-entry > a,
   .nav-link {
     font-size: 14px;
   }
@@ -1820,7 +1824,7 @@ h2 {
   .application[data-sidebar-collapsed="true"] .desktop-sidebar .nav-link,
   .application[data-sidebar-collapsed="true"] .desktop-sidebar .example-link,
   .application[data-sidebar-collapsed="true"] .desktop-sidebar .new-playground-button,
-  .application[data-sidebar-collapsed="true"] .desktop-sidebar .library-entry > button:first-child {
+  .application[data-sidebar-collapsed="true"] .desktop-sidebar .library-entry > a {
     display: flex;
     justify-content: center;
     padding-inline: 0;
