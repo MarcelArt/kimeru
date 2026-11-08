@@ -418,7 +418,7 @@ export function App({
   const navigationContent = (
     <>
       <div className="brand">
-        <span className="brand-mark">k</span>kimeru
+        <img className="brand-mark" src="/brand/kimeru.svg" alt="" width={24} height={24} />kimeru
         <Button
           className="mobile-nav-close"
           variant="ghost"

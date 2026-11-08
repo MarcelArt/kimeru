@@ -117,17 +117,10 @@ h2 {
   letter-spacing: -0.75px;
 }
 .brand-mark {
-  display: inline-grid;
+  display: block;
   width: 24px;
   height: 24px;
-  place-items: center;
-  color: var(--primary-foreground);
-  background: var(--primary);
-  font-size: 19px;
-  line-height: 1;
-  letter-spacing: -0.5px;
-  font-weight: 650;
-  border-radius: 3px;
+  flex-shrink: 0;
 }
 .new-playground-button {
   margin: 22px 0 14px;

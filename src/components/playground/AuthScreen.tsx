@@ -37,7 +37,7 @@ export function AuthScreen({
   return (
     <div className="auth-page">
       <div className="auth-brand">
-        <span className="brand-mark">k</span> kimeru
+        <img className="brand-mark" src="/brand/kimeru.svg" alt="" width={24} height={24} /> kimeru
       </div>
       <main className="auth-card">
         <div className="auth-emblem">

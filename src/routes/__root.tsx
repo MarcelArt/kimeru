@@ -29,6 +29,22 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     ],
     links: [
       {
+        rel: "icon",
+        href: "/favicon.ico",
+        sizes: "16x16 32x32 48x48",
+      },
+      {
+        rel: "icon",
+        type: "image/svg+xml",
+        href: "/brand/kimeru.svg",
+        sizes: "any",
+      },
+      {
+        rel: "apple-touch-icon",
+        href: "/apple-touch-icon.png",
+        sizes: "180x180",
+      },
+      {
         rel: "stylesheet",
         href: appCss,
       },
