@@ -1,0 +1,697 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-08T09:30:28.926171Z",
+  "title": "Design System: Kimeru",
+  "extensions": {
+    "colorMeta": {
+      "background": {
+        "displayName": "Charcoal",
+        "tonalRamp": [
+          "oklch(0.15 0.0000 0)",
+          "oklch(0.25 0.0000 0)",
+          "oklch(0.35 0.0000 0)",
+          "oklch(0.47 0.0000 0)",
+          "oklch(0.59 0.0000 0)",
+          "oklch(0.71 0.0000 0)",
+          "oklch(0.83 0.0000 0)",
+          "oklch(0.95 0.0000 0)"
+        ],
+        "role": "neutral"
+      },
+      "foreground": {
+        "displayName": "Foreground",
+        "tonalRamp": [
+          "oklch(0.15 0.0000 0)",
+          "oklch(0.25 0.0000 0)",
+          "oklch(0.35 0.0000 0)",
+          "oklch(0.47 0.0000 0)",
+          "oklch(0.59 0.0000 0)",
+          "oklch(0.71 0.0000 0)",
+          "oklch(0.83 0.0000 0)",
+          "oklch(0.95 0.0000 0)"
+        ],
+        "role": "neutral"
+      },
+      "card": {
+        "displayName": "Raised Charcoal",
+        "tonalRamp": [
+          "oklch(0.15 0.0000 0)",
+          "oklch(0.25 0.0000 0)",
+          "oklch(0.35 0.0000 0)",
+          "oklch(0.47 0.0000 0)",
+          "oklch(0.59 0.0000 0)",
+          "oklch(0.71 0.0000 0)",
+          "oklch(0.83 0.0000 0)",
+          "oklch(0.95 0.0000 0)"
+        ],
+        "role": "neutral"
+      },
+      "primary": {
+        "displayName": "Deep Rose",
+        "tonalRamp": [
+          "oklch(0.15 0.0374 3.815)",
+          "oklch(0.25 0.0935 3.815)",
+          "oklch(0.35 0.1496 3.815)",
+          "oklch(0.47 0.1870 3.815)",
+          "oklch(0.59 0.1870 3.815)",
+          "oklch(0.71 0.1496 3.815)",
+          "oklch(0.83 0.0935 3.815)",
+          "oklch(0.95 0.0374 3.815)"
+        ],
+        "role": "primary"
+      },
+      "primary-foreground": {
+        "displayName": "Primary Foreground",
+        "tonalRamp": [
+          "oklch(0.15 0.0028 343.198)",
+          "oklch(0.25 0.0070 343.198)",
+          "oklch(0.35 0.0112 343.198)",
+          "oklch(0.47 0.0140 343.198)",
+          "oklch(0.59 0.0140 343.198)",
+          "oklch(0.71 0.0112 343.198)",
+          "oklch(0.83 0.0070 343.198)",
+          "oklch(0.95 0.0028 343.198)"
+        ],
+        "role": "neutral"
+      },
+      "secondary": {
+        "displayName": "Secondary",
+        "tonalRamp": [
+          "oklch(0.15 0.0012 286.033)",
+          "oklch(0.25 0.0030 286.033)",
+          "oklch(0.35 0.0048 286.033)",
+          "oklch(0.47 0.0060 286.033)",
+          "oklch(0.59 0.0060 286.033)",
+          "oklch(0.71 0.0048 286.033)",
+          "oklch(0.83 0.0030 286.033)",
+          "oklch(0.95 0.0012 286.033)"
+        ],
+        "role": "neutral"
+      },
+      "secondary-foreground": {
+        "displayName": "Secondary Foreground",
+        "tonalRamp": [
+          "oklch(0.15 0.0000 0)",
+          "oklch(0.25 0.0000 0)",
+          "oklch(0.35 0.0000 0)",
+          "oklch(0.47 0.0000 0)",
+          "oklch(0.59 0.0000 0)",
+          "oklch(0.71 0.0000 0)",
+          "oklch(0.83 0.0000 0)",
+          "oklch(0.95 0.0000 0)"
+        ],
+        "role": "neutral"
+      },
+      "muted": {
+        "displayName": "Graphite",
+        "tonalRamp": [
+          "oklch(0.15 0.0000 0)",
+          "oklch(0.25 0.0000 0)",
+          "oklch(0.35 0.0000 0)",
+          "oklch(0.47 0.0000 0)",
+          "oklch(0.59 0.0000 0)",
+          "oklch(0.71 0.0000 0)",
+          "oklch(0.83 0.0000 0)",
+          "oklch(0.95 0.0000 0)"
+        ],
+        "role": "neutral"
+      },
+      "muted-foreground": {
+        "displayName": "Muted Foreground",
+        "tonalRamp": [
+          "oklch(0.15 0.0000 0)",
+          "oklch(0.25 0.0000 0)",
+          "oklch(0.35 0.0000 0)",
+          "oklch(0.47 0.0000 0)",
+          "oklch(0.59 0.0000 0)",
+          "oklch(0.71 0.0000 0)",
+          "oklch(0.83 0.0000 0)",
+          "oklch(0.95 0.0000 0)"
+        ],
+        "role": "neutral"
+      },
+      "border": {
+        "displayName": "Border",
+        "tonalRamp": [
+          "oklch(0.15 0.0000 0)",
+          "oklch(0.25 0.0000 0)",
+          "oklch(0.35 0.0000 0)",
+          "oklch(0.47 0.0000 0)",
+          "oklch(0.59 0.0000 0)",
+          "oklch(0.71 0.0000 0)",
+          "oklch(0.83 0.0000 0)",
+          "oklch(0.95 0.0000 0)"
+        ],
+        "role": "neutral"
+      },
+      "input": {
+        "displayName": "Input",
+        "tonalRamp": [
+          "oklch(0.15 0.0000 0)",
+          "oklch(0.25 0.0000 0)",
+          "oklch(0.35 0.0000 0)",
+          "oklch(0.47 0.0000 0)",
+          "oklch(0.59 0.0000 0)",
+          "oklch(0.71 0.0000 0)",
+          "oklch(0.83 0.0000 0)",
+          "oklch(0.95 0.0000 0)"
+        ],
+        "role": "neutral"
+      },
+      "ring": {
+        "displayName": "Ring",
+        "tonalRamp": [
+          "oklch(0.15 0.0000 0)",
+          "oklch(0.25 0.0000 0)",
+          "oklch(0.35 0.0000 0)",
+          "oklch(0.47 0.0000 0)",
+          "oklch(0.59 0.0000 0)",
+          "oklch(0.71 0.0000 0)",
+          "oklch(0.83 0.0000 0)",
+          "oklch(0.95 0.0000 0)"
+        ],
+        "role": "neutral"
+      },
+      "sidebar-primary": {
+        "displayName": "Signal Rose",
+        "tonalRamp": [
+          "oklch(0.15 0.0482 354.308)",
+          "oklch(0.25 0.1205 354.308)",
+          "oklch(0.35 0.1928 354.308)",
+          "oklch(0.47 0.2410 354.308)",
+          "oklch(0.59 0.2410 354.308)",
+          "oklch(0.71 0.1928 354.308)",
+          "oklch(0.83 0.1205 354.308)",
+          "oklch(0.95 0.0482 354.308)"
+        ],
+        "role": "primary"
+      },
+      "destructive": {
+        "displayName": "Destructive",
+        "tonalRamp": [
+          "oklch(0.15 0.0382 22.216)",
+          "oklch(0.25 0.0955 22.216)",
+          "oklch(0.35 0.1528 22.216)",
+          "oklch(0.47 0.1910 22.216)",
+          "oklch(0.59 0.1910 22.216)",
+          "oklch(0.71 0.1528 22.216)",
+          "oklch(0.83 0.0955 22.216)",
+          "oklch(0.95 0.0382 22.216)"
+        ]
+      },
+      "light-background": {
+        "displayName": "Paper",
+        "tonalRamp": [
+          "oklch(0.15 0.0000 0)",
+          "oklch(0.25 0.0000 0)",
+          "oklch(0.35 0.0000 0)",
+          "oklch(0.47 0.0000 0)",
+          "oklch(0.59 0.0000 0)",
+          "oklch(0.71 0.0000 0)",
+          "oklch(0.83 0.0000 0)",
+          "oklch(0.95 0.0000 0)"
+        ],
+        "role": "neutral"
+      },
+      "light-foreground": {
+        "displayName": "Light Foreground",
+        "tonalRamp": [
+          "oklch(0.15 0.0000 0)",
+          "oklch(0.25 0.0000 0)",
+          "oklch(0.35 0.0000 0)",
+          "oklch(0.47 0.0000 0)",
+          "oklch(0.59 0.0000 0)",
+          "oklch(0.71 0.0000 0)",
+          "oklch(0.83 0.0000 0)",
+          "oklch(0.95 0.0000 0)"
+        ],
+        "role": "neutral"
+      },
+      "light-card": {
+        "displayName": "Paper Surface",
+        "tonalRamp": [
+          "oklch(0.15 0.0000 0)",
+          "oklch(0.25 0.0000 0)",
+          "oklch(0.35 0.0000 0)",
+          "oklch(0.47 0.0000 0)",
+          "oklch(0.59 0.0000 0)",
+          "oklch(0.71 0.0000 0)",
+          "oklch(0.83 0.0000 0)",
+          "oklch(0.95 0.0000 0)"
+        ],
+        "role": "neutral"
+      },
+      "light-primary": {
+        "displayName": "Light Primary",
+        "tonalRamp": [
+          "oklch(0.15 0.0446 3.958)",
+          "oklch(0.25 0.1115 3.958)",
+          "oklch(0.35 0.1784 3.958)",
+          "oklch(0.47 0.2230 3.958)",
+          "oklch(0.59 0.2230 3.958)",
+          "oklch(0.71 0.1784 3.958)",
+          "oklch(0.83 0.1115 3.958)",
+          "oklch(0.95 0.0446 3.958)"
+        ],
+        "role": "primary"
+      },
+      "light-secondary": {
+        "displayName": "Light Secondary",
+        "tonalRamp": [
+          "oklch(0.15 0.0002 286.375)",
+          "oklch(0.25 0.0005 286.375)",
+          "oklch(0.35 0.0008 286.375)",
+          "oklch(0.47 0.0010 286.375)",
+          "oklch(0.59 0.0010 286.375)",
+          "oklch(0.71 0.0008 286.375)",
+          "oklch(0.83 0.0005 286.375)",
+          "oklch(0.95 0.0002 286.375)"
+        ],
+        "role": "neutral"
+      },
+      "light-secondary-foreground": {
+        "displayName": "Light Secondary Foreground",
+        "tonalRamp": [
+          "oklch(0.15 0.0012 285.885)",
+          "oklch(0.25 0.0030 285.885)",
+          "oklch(0.35 0.0048 285.885)",
+          "oklch(0.47 0.0060 285.885)",
+          "oklch(0.59 0.0060 285.885)",
+          "oklch(0.71 0.0048 285.885)",
+          "oklch(0.83 0.0030 285.885)",
+          "oklch(0.95 0.0012 285.885)"
+        ],
+        "role": "neutral"
+      },
+      "light-muted": {
+        "displayName": "Pale Gray",
+        "tonalRamp": [
+          "oklch(0.15 0.0000 0)",
+          "oklch(0.25 0.0000 0)",
+          "oklch(0.35 0.0000 0)",
+          "oklch(0.47 0.0000 0)",
+          "oklch(0.59 0.0000 0)",
+          "oklch(0.71 0.0000 0)",
+          "oklch(0.83 0.0000 0)",
+          "oklch(0.95 0.0000 0)"
+        ],
+        "role": "neutral"
+      },
+      "light-muted-foreground": {
+        "displayName": "Light Muted Foreground",
+        "tonalRamp": [
+          "oklch(0.15 0.0000 0)",
+          "oklch(0.25 0.0000 0)",
+          "oklch(0.35 0.0000 0)",
+          "oklch(0.47 0.0000 0)",
+          "oklch(0.59 0.0000 0)",
+          "oklch(0.71 0.0000 0)",
+          "oklch(0.83 0.0000 0)",
+          "oklch(0.95 0.0000 0)"
+        ],
+        "role": "neutral"
+      },
+      "light-border": {
+        "displayName": "Light Border",
+        "tonalRamp": [
+          "oklch(0.15 0.0000 0)",
+          "oklch(0.25 0.0000 0)",
+          "oklch(0.35 0.0000 0)",
+          "oklch(0.47 0.0000 0)",
+          "oklch(0.59 0.0000 0)",
+          "oklch(0.71 0.0000 0)",
+          "oklch(0.83 0.0000 0)",
+          "oklch(0.95 0.0000 0)"
+        ],
+        "role": "neutral"
+      },
+      "light-input": {
+        "displayName": "Light Input",
+        "tonalRamp": [
+          "oklch(0.15 0.0000 0)",
+          "oklch(0.25 0.0000 0)",
+          "oklch(0.35 0.0000 0)",
+          "oklch(0.47 0.0000 0)",
+          "oklch(0.59 0.0000 0)",
+          "oklch(0.71 0.0000 0)",
+          "oklch(0.83 0.0000 0)",
+          "oklch(0.95 0.0000 0)"
+        ],
+        "role": "neutral"
+      },
+      "light-ring": {
+        "displayName": "Light Ring",
+        "tonalRamp": [
+          "oklch(0.15 0.0000 0)",
+          "oklch(0.25 0.0000 0)",
+          "oklch(0.35 0.0000 0)",
+          "oklch(0.47 0.0000 0)",
+          "oklch(0.59 0.0000 0)",
+          "oklch(0.71 0.0000 0)",
+          "oklch(0.83 0.0000 0)",
+          "oklch(0.95 0.0000 0)"
+        ],
+        "role": "neutral"
+      },
+      "light-sidebar-primary": {
+        "displayName": "Light Sidebar Primary",
+        "tonalRamp": [
+          "oklch(0.15 0.0498 0.584)",
+          "oklch(0.25 0.1245 0.584)",
+          "oklch(0.35 0.1992 0.584)",
+          "oklch(0.47 0.2490 0.584)",
+          "oklch(0.59 0.2490 0.584)",
+          "oklch(0.71 0.1992 0.584)",
+          "oklch(0.83 0.1245 0.584)",
+          "oklch(0.95 0.0498 0.584)"
+        ],
+        "role": "primary"
+      },
+      "light-destructive": {
+        "displayName": "Light Destructive",
+        "tonalRamp": [
+          "oklch(0.15 0.0490 27.325)",
+          "oklch(0.25 0.1225 27.325)",
+          "oklch(0.35 0.1960 27.325)",
+          "oklch(0.47 0.2450 27.325)",
+          "oklch(0.59 0.2450 27.325)",
+          "oklch(0.71 0.1960 27.325)",
+          "oklch(0.83 0.1225 27.325)",
+          "oklch(0.95 0.0490 27.325)"
+        ]
+      },
+      "light-sidebar": {
+        "displayName": "Soft Paper",
+        "tonalRamp": [
+          "oklch(0.15 0.0000 0)",
+          "oklch(0.25 0.0000 0)",
+          "oklch(0.35 0.0000 0)",
+          "oklch(0.47 0.0000 0)",
+          "oklch(0.59 0.0000 0)",
+          "oklch(0.71 0.0000 0)",
+          "oklch(0.83 0.0000 0)",
+          "oklch(0.95 0.0000 0)"
+        ],
+        "role": "neutral"
+      },
+      "chart-1": {
+        "displayName": "Chart 1",
+        "tonalRamp": [
+          "oklch(0.15 0.0234 11.638)",
+          "oklch(0.25 0.0585 11.638)",
+          "oklch(0.35 0.0936 11.638)",
+          "oklch(0.47 0.1170 11.638)",
+          "oklch(0.59 0.1170 11.638)",
+          "oklch(0.71 0.0936 11.638)",
+          "oklch(0.83 0.0585 11.638)",
+          "oklch(0.95 0.0234 11.638)"
+        ],
+        "role": "primary"
+      },
+      "chart-2": {
+        "displayName": "Chart 2",
+        "tonalRamp": [
+          "oklch(0.15 0.0492 16.439)",
+          "oklch(0.25 0.1230 16.439)",
+          "oklch(0.35 0.1968 16.439)",
+          "oklch(0.47 0.2460 16.439)",
+          "oklch(0.59 0.2460 16.439)",
+          "oklch(0.71 0.1968 16.439)",
+          "oklch(0.83 0.1230 16.439)",
+          "oklch(0.95 0.0492 16.439)"
+        ],
+        "role": "primary"
+      },
+      "chart-3": {
+        "displayName": "Chart 3",
+        "tonalRamp": [
+          "oklch(0.15 0.0506 17.585)",
+          "oklch(0.25 0.1265 17.585)",
+          "oklch(0.35 0.2024 17.585)",
+          "oklch(0.47 0.2530 17.585)",
+          "oklch(0.59 0.2530 17.585)",
+          "oklch(0.71 0.2024 17.585)",
+          "oklch(0.83 0.1265 17.585)",
+          "oklch(0.95 0.0506 17.585)"
+        ],
+        "role": "primary"
+      },
+      "chart-4": {
+        "displayName": "Chart 4",
+        "tonalRamp": [
+          "oklch(0.15 0.0444 16.935)",
+          "oklch(0.25 0.1110 16.935)",
+          "oklch(0.35 0.1776 16.935)",
+          "oklch(0.47 0.2220 16.935)",
+          "oklch(0.59 0.2220 16.935)",
+          "oklch(0.71 0.1776 16.935)",
+          "oklch(0.83 0.1110 16.935)",
+          "oklch(0.95 0.0444 16.935)"
+        ],
+        "role": "primary"
+      },
+      "chart-5": {
+        "displayName": "Chart 5",
+        "tonalRamp": [
+          "oklch(0.15 0.0376 13.697)",
+          "oklch(0.25 0.0940 13.697)",
+          "oklch(0.35 0.1504 13.697)",
+          "oklch(0.47 0.1880 13.697)",
+          "oklch(0.59 0.1880 13.697)",
+          "oklch(0.71 0.1504 13.697)",
+          "oklch(0.83 0.0940 13.697)",
+          "oklch(0.95 0.0376 13.697)"
+        ],
+        "role": "primary"
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Workspace and management page headings."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Section headings."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "General interface text and inherited desktop controls."
+      },
+      "body-mobile": {
+        "displayName": "Body Mobile",
+        "purpose": "General interface text and inherited mobile controls."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Supporting labels and explanations."
+      },
+      "badge": {
+        "displayName": "Badge",
+        "purpose": "Reusable badge primitive before local overrides."
+      },
+      "code": {
+        "displayName": "Code",
+        "purpose": "State editor content."
+      },
+      "code-small": {
+        "displayName": "Code Small",
+        "purpose": "Raw JSON inspection."
+      },
+      "answer": {
+        "displayName": "Answer",
+        "purpose": "Selected answer text."
+      },
+      "answer-numeric": {
+        "displayName": "Answer Numeric",
+        "purpose": "Prominent score and truth values."
+      }
+    },
+    "shadows": [
+      {
+        "name": "menu",
+        "value": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+        "purpose": "Floating select menus; ordinary containers stay flat."
+      },
+      {
+        "name": "box-contrast",
+        "value": "0 0 0 1px color-mix(in srgb, var(--background) 30%, transparent)",
+        "purpose": "Contrast halo around the Box result outline."
+      },
+      {
+        "name": "control-focus",
+        "value": "0 0 0 1px color-mix(in oklab, var(--ring) 50%, transparent)",
+        "purpose": "Keyboard-focus ring for buttons, inputs, and select triggers."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-transition",
+        "value": "150ms",
+        "purpose": "Default primitive transitions; state-format controls transition colors only."
+      },
+      {
+        "name": "ease-standard",
+        "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Default primitive transition easing."
+      },
+      {
+        "name": "overlay-transition",
+        "value": "100ms",
+        "purpose": "Select and dialog fade/zoom transitions; mobile drawer disables entrance animation."
+      },
+      {
+        "name": "button-press",
+        "value": "translateY(1px)",
+        "purpose": "Active ordinary buttons; popup triggers are excluded."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "mobile-max",
+        "value": "680px"
+      },
+      {
+        "name": "desktop-min",
+        "value": "681px"
+      },
+      {
+        "name": "stacked-workspace-max",
+        "value": "950px"
+      },
+      {
+        "name": "compact-desktop-max",
+        "value": "1180px"
+      },
+      {
+        "name": "wide-workspace-min",
+        "value": "1700px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The compact primary action used to run a playground and submit forms.",
+      "html": "<button class=\"ds-button-primary\" type=\"button\"><svg class=\"ds-icon\" xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z\"/></svg>Run</button>",
+      "css": ".ds-button-primary{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;gap:6px;height:32px;min-height:32px;padding:0 10px;border:1px solid transparent;border-radius:0;font:400 14px/1.5 'Inter Variable',sans-serif;white-space:nowrap;cursor:pointer;user-select:none;outline:none;transition:all 150ms cubic-bezier(0.4,0,0.2,1);}\n.ds-button-primary svg{width:16px;height:16px;flex-shrink:0;pointer-events:none;}\n.ds-button-primary:focus-visible{border-color:var(--ring,oklch(0.556 0 0));box-shadow:0 0 0 1px color-mix(in oklab,var(--ring,oklch(0.556 0 0)) 50%,transparent);}\n.ds-button-primary:active:not([aria-haspopup]){transform:translateY(1px);}\n.ds-button-primary:disabled{pointer-events:none;opacity:.5;cursor:not-allowed;}\n@media(max-width:680px),(pointer:coarse){.ds-button-primary{min-height:44px;}}\n@media(max-width:680px){.ds-button-primary{font-size:16px;}}\n@media(prefers-reduced-motion:reduce){.ds-button-primary{transition:none;}}\n.ds-button-primary{background:var(--primary,oklch(0.459 0.187 3.815));color:var(--primary-foreground,oklch(0.971 0.014 343.198));}\n.ds-button-primary:hover{background:color-mix(in oklab,var(--primary,oklch(0.459 0.187 3.815)) 80%,transparent);}"
+    },
+    {
+      "name": "Outline button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "A bordered secondary action, used for New playground, Save, and Cancel.",
+      "html": "<button class=\"ds-button-outline\" type=\"button\"><svg class=\"ds-icon\" xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"M12 5v14\"/></svg>New playground</button>",
+      "css": ".ds-button-outline{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;gap:6px;height:32px;min-height:32px;padding:0 10px;border:1px solid transparent;border-radius:0;font:400 14px/1.5 'Inter Variable',sans-serif;white-space:nowrap;cursor:pointer;user-select:none;outline:none;transition:all 150ms cubic-bezier(0.4,0,0.2,1);}\n.ds-button-outline svg{width:16px;height:16px;flex-shrink:0;pointer-events:none;}\n.ds-button-outline:focus-visible{border-color:var(--ring,oklch(0.556 0 0));box-shadow:0 0 0 1px color-mix(in oklab,var(--ring,oklch(0.556 0 0)) 50%,transparent);}\n.ds-button-outline:active:not([aria-haspopup]){transform:translateY(1px);}\n.ds-button-outline:disabled{pointer-events:none;opacity:.5;cursor:not-allowed;}\n@media(max-width:680px),(pointer:coarse){.ds-button-outline{min-height:44px;}}\n@media(max-width:680px){.ds-button-outline{font-size:16px;}}\n@media(prefers-reduced-motion:reduce){.ds-button-outline{transition:none;}}\n.ds-button-outline{background:color-mix(in oklab,var(--input,oklch(1 0 0 / 15%)) 30%,transparent);border-color:var(--input,oklch(1 0 0 / 15%));color:var(--foreground,oklch(0.985 0 0));}\n.ds-button-outline:hover{background:color-mix(in oklab,var(--input,oklch(1 0 0 / 15%)) 50%,transparent);}\n.ds-button-outline[aria-expanded=true]{background:var(--muted,oklch(0.269 0 0));color:var(--foreground,oklch(0.985 0 0));}\n:host-context(.light) .ds-button-outline{background:var(--background,oklch(0.145 0 0));border-color:var(--border,oklch(1 0 0 / 10%));}\n:host-context(.light) .ds-button-outline:hover,:host-context(.light) .ds-button-outline[aria-expanded=true]{background:var(--muted,oklch(0.269 0 0));color:var(--foreground,oklch(0.985 0 0));}\n:host-context(.light) .ds-button-outline:focus-visible{border-color:var(--ring,oklch(0.556 0 0));}"
+    },
+    {
+      "name": "Ghost button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "A low-emphasis action used for adding questions and utility controls.",
+      "html": "<button class=\"ds-button-ghost\" type=\"button\"><svg class=\"ds-icon\" xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"M12 5v14\"/></svg>Add question</button>",
+      "css": ".ds-button-ghost{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;gap:6px;height:32px;min-height:32px;padding:0 10px;border:1px solid transparent;border-radius:0;font:400 14px/1.5 'Inter Variable',sans-serif;white-space:nowrap;cursor:pointer;user-select:none;outline:none;transition:all 150ms cubic-bezier(0.4,0,0.2,1);}\n.ds-button-ghost svg{width:16px;height:16px;flex-shrink:0;pointer-events:none;}\n.ds-button-ghost:focus-visible{border-color:var(--ring,oklch(0.556 0 0));box-shadow:0 0 0 1px color-mix(in oklab,var(--ring,oklch(0.556 0 0)) 50%,transparent);}\n.ds-button-ghost:active:not([aria-haspopup]){transform:translateY(1px);}\n.ds-button-ghost:disabled{pointer-events:none;opacity:.5;cursor:not-allowed;}\n@media(max-width:680px),(pointer:coarse){.ds-button-ghost{min-height:44px;}}\n@media(max-width:680px){.ds-button-ghost{font-size:16px;}}\n@media(prefers-reduced-motion:reduce){.ds-button-ghost{transition:none;}}\n.ds-button-ghost{background:transparent;color:var(--foreground,oklch(0.985 0 0));}\n.ds-button-ghost:hover{background:color-mix(in oklab,var(--muted,oklch(0.269 0 0)) 50%,transparent);}\n.ds-button-ghost[aria-expanded=true]{background:var(--muted,oklch(0.269 0 0));color:var(--foreground,oklch(0.985 0 0));}\n:host-context(.light) .ds-button-ghost:hover{background:var(--muted,oklch(0.269 0 0));}"
+    },
+    {
+      "name": "Destructive button",
+      "kind": "button",
+      "refersTo": "button-destructive",
+      "description": "The explicit delete action inside a confirmation dialog.",
+      "html": "<button class=\"ds-button-destructive\" type=\"button\">Delete connection</button>",
+      "css": ".ds-button-destructive{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;gap:6px;height:32px;min-height:32px;padding:0 10px;border:1px solid transparent;border-radius:0;font:400 14px/1.5 'Inter Variable',sans-serif;white-space:nowrap;cursor:pointer;user-select:none;outline:none;transition:all 150ms cubic-bezier(0.4,0,0.2,1);}\n.ds-button-destructive svg{width:16px;height:16px;flex-shrink:0;pointer-events:none;}\n.ds-button-destructive:focus-visible{border-color:var(--ring,oklch(0.556 0 0));box-shadow:0 0 0 1px color-mix(in oklab,var(--ring,oklch(0.556 0 0)) 50%,transparent);}\n.ds-button-destructive:active:not([aria-haspopup]){transform:translateY(1px);}\n.ds-button-destructive:disabled{pointer-events:none;opacity:.5;cursor:not-allowed;}\n@media(max-width:680px),(pointer:coarse){.ds-button-destructive{min-height:44px;}}\n@media(max-width:680px){.ds-button-destructive{font-size:16px;}}\n@media(prefers-reduced-motion:reduce){.ds-button-destructive{transition:none;}}\n.ds-button-destructive{background:color-mix(in oklab,var(--destructive,oklch(0.704 0.191 22.216)) 20%,transparent);color:var(--destructive,oklch(0.704 0.191 22.216));}\n.ds-button-destructive:hover{background:color-mix(in oklab,var(--destructive,oklch(0.704 0.191 22.216)) 30%,transparent);}\n.ds-button-destructive:focus-visible{border-color:color-mix(in oklab,var(--destructive,oklch(0.704 0.191 22.216)) 40%,transparent);box-shadow:0 0 0 1px color-mix(in oklab,var(--destructive,oklch(0.704 0.191 22.216)) 40%,transparent);}\n:host-context(.light) .ds-button-destructive{background:color-mix(in oklab,var(--destructive,oklch(0.704 0.191 22.216)) 10%,transparent);}\n:host-context(.light) .ds-button-destructive:hover{background:color-mix(in oklab,var(--destructive,oklch(0.704 0.191 22.216)) 20%,transparent);}\n:host-context(.light) .ds-button-destructive:focus-visible{box-shadow:0 0 0 1px color-mix(in oklab,var(--destructive,oklch(0.704 0.191 22.216)) 20%,transparent);}"
+    },
+    {
+      "name": "Text input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "An editable text field with the same compact, square treatment as the application forms.",
+      "html": "<input class=\"ds-input\" type=\"text\" aria-label=\"Connection name\" placeholder=\"Connection name\" />",
+      "css": ".ds-input{width:100%;min-width:0;height:32px;min-height:32px;padding:4px 10px;border:1px solid var(--input,oklch(1 0 0 / 15%));border-radius:0;background:color-mix(in oklab,var(--input,oklch(1 0 0 / 15%)) 30%,transparent);color:var(--foreground,oklch(0.985 0 0));font:400 14px/1.5 'Inter Variable',sans-serif;outline:none;transition:color 150ms cubic-bezier(0.4,0,0.2,1),background-color 150ms cubic-bezier(0.4,0,0.2,1),border-color 150ms cubic-bezier(0.4,0,0.2,1);}\n.ds-input::placeholder{color:var(--muted-foreground,oklch(0.708 0 0));}\n.ds-input:focus-visible{border-color:var(--ring,oklch(0.556 0 0));box-shadow:0 0 0 1px color-mix(in oklab,var(--ring,oklch(0.556 0 0)) 50%,transparent);}\n.ds-input:disabled{pointer-events:none;cursor:not-allowed;opacity:.5;background:color-mix(in oklab,var(--input,oklch(1 0 0 / 15%)) 80%,transparent);}\n.ds-input[aria-invalid=true]{border-color:color-mix(in oklab,var(--destructive,oklch(0.704 0.191 22.216)) 50%,transparent);box-shadow:0 0 0 1px color-mix(in oklab,var(--destructive,oklch(0.704 0.191 22.216)) 40%,transparent);}\n:host-context(.light) .ds-input{background:transparent;}\n:host-context(.light) .ds-input:disabled{background:color-mix(in oklab,var(--input,oklch(1 0 0 / 15%)) 50%,transparent);}\n:host-context(.light) .ds-input[aria-invalid=true]{border-color:var(--destructive,oklch(0.704 0.191 22.216));box-shadow:0 0 0 1px color-mix(in oklab,var(--destructive,oklch(0.704 0.191 22.216)) 20%,transparent);}\n@media(max-width:680px),(pointer:coarse){.ds-input{min-height:44px;}}\n@media(max-width:680px){.ds-input{font-size:16px;}}\n@media(prefers-reduced-motion:reduce){.ds-input{transition:none;}}"
+    },
+    {
+      "name": "Workspace navigation",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "The active desktop navigation item; the application retains labels for assistive technology when its sidebar collapses to icons.",
+      "html": "<nav class=\"ds-navigation\" aria-label=\"Workspace preview\"><button class=\"ds-nav-item\" type=\"button\" aria-current=\"page\" aria-label=\"Playground\" title=\"Playground\"><svg class=\"ds-icon\" xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2\"/><path d=\"M6.453 15h11.094\"/><path d=\"M8.5 2h7\"/></svg><span>Playground</span></button></nav>",
+      "css": ".ds-navigation{width:196px;max-width:100%;background:var(--sidebar,oklch(0.205 0 0));}\n.ds-nav-item{display:flex;align-items:center;gap:10px;width:100%;min-height:32px;padding:6px 10px;border:0;border-radius:3px;background:transparent;color:var(--muted-foreground,oklch(0.708 0 0));font:400 14px/1.5 'Inter Variable',sans-serif;text-align:left;cursor:pointer;}\n.ds-nav-item svg{width:17px;height:17px;stroke-width:1.6;flex-shrink:0;}\n.ds-nav-item:hover,.ds-nav-item[aria-current=page]{background:var(--muted,oklch(0.269 0 0));color:var(--foreground,oklch(0.985 0 0));}\n.ds-nav-item[aria-current=page] svg{color:var(--sidebar-primary,oklch(0.656 0.241 354.308));}\n.ds-nav-item:focus-visible{outline-offset:4px;}\n@media(max-width:680px),(pointer:coarse){.ds-nav-item{min-height:44px;}}"
+    },
+    {
+      "name": "Outline badge",
+      "kind": "chip",
+      "refersTo": "badge-outline",
+      "description": "A static bordered status or type label, shown here in its reusable primitive size.",
+      "html": "<span class=\"ds-badge-outline\">Personal</span>",
+      "css": ".ds-badge-outline{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;gap:4px;width:fit-content;height:20px;padding:2px 8px;overflow:hidden;border:1px solid var(--border,oklch(1 0 0 / 10%));border-radius:0;background:transparent;color:var(--foreground,oklch(0.985 0 0));font:500 12px/1.333333 'Inter Variable',sans-serif;white-space:nowrap;}"
+    },
+    {
+      "name": "Connection card",
+      "kind": "card",
+      "refersTo": "connection-card",
+      "description": "The flat, bordered connection container, with a readable endpoint and footer actions. The Edit button is a visual specimen.",
+      "html": "<article class=\"ds-connection-card\"><div class=\"ds-connection-heading\"><h2>Development models</h2><span>TypeSafe System One</span></div><code class=\"ds-connection-url\">https://api.typesafe.ai</code><footer class=\"ds-connection-footer\"><span>Personal connection</span><button class=\"ds-connection-edit\" type=\"button\">Edit</button></footer></article>",
+      "css": ".ds-connection-card{min-width:0;padding:14px 16px 6px;border:1px solid var(--border,oklch(1 0 0 / 10%));border-radius:4px;background:var(--card,oklch(0.205 0 0));color:var(--foreground,oklch(0.985 0 0));font:400 14px/1.5 'Inter Variable',sans-serif;}\n.ds-connection-heading h2{margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 15px/1.4 'Inter Variable',sans-serif;}\n.ds-connection-heading>span{color:var(--muted-foreground,oklch(0.708 0 0));font-size:11px;}\n.ds-connection-url{display:block;margin:14px 0 10px;padding:8px 10px;border:1px solid var(--border,oklch(1 0 0 / 10%));background:var(--background,oklch(0.145 0 0));font:400 12px/1.6 ui-monospace,monospace;overflow-wrap:anywhere;}\n.ds-connection-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:40px;padding-top:7px;border-top:1px solid var(--border,oklch(1 0 0 / 10%));}\n.ds-connection-footer>span{font-size:11px;color:var(--muted-foreground,oklch(0.708 0 0));}\n.ds-connection-edit{display:inline-flex;align-items:center;justify-content:center;min-height:32px;padding:0 10px;border:1px solid transparent;border-radius:0;background:transparent;color:var(--foreground,oklch(0.985 0 0));font:400 14px/1.5 'Inter Variable',sans-serif;cursor:pointer;outline:none;transition:all 150ms cubic-bezier(0.4,0,0.2,1);}\n.ds-connection-edit:hover{background:color-mix(in oklab,var(--muted,oklch(0.269 0 0)) 50%,transparent);}\n.ds-connection-edit:focus-visible{border-color:var(--ring,oklch(0.556 0 0));box-shadow:0 0 0 1px color-mix(in oklab,var(--ring,oklch(0.556 0 0)) 50%,transparent);}\n.ds-connection-edit:active{transform:translateY(1px);}\n:host-context(.light) .ds-connection-edit:hover{background:var(--muted,oklch(0.269 0 0));}\n@media(max-width:680px),(pointer:coarse){.ds-connection-edit{min-height:44px;}}\n@media(prefers-reduced-motion:reduce){.ds-connection-edit{transition:none;}}"
+    },
+    {
+      "name": "State format selector",
+      "kind": "custom",
+      "refersTo": "state-format",
+      "description": "The Text/JSON single-selection control, reproduced with native radios for a working framework-free preview. The application uses Radix ToggleGroup.",
+      "html": "<fieldset class=\"ds-state-format\" aria-label=\"State format\"><label class=\"ds-state-option\"><input class=\"ds-state-radio\" type=\"radio\" name=\"ds-state-format\" value=\"text\" checked /><span class=\"ds-state-label\">Text</span></label><label class=\"ds-state-option\"><input class=\"ds-state-radio\" type=\"radio\" name=\"ds-state-format\" value=\"json\" /><span class=\"ds-state-label\">JSON</span></label></fieldset>",
+      "css": ".ds-state-format{display:inline-flex;align-items:center;gap:2px;width:fit-content;height:32px;margin:0;padding:2px;border:1px solid var(--border,oklch(1 0 0 / 10%));border-radius:0;background:var(--card,oklch(0.205 0 0));color:var(--foreground,oklch(0.985 0 0));font:400 14px/1.5 'Inter Variable',sans-serif;}\n.ds-state-option{position:relative;display:inline-flex;}\n.ds-state-radio{position:absolute;width:1px;height:1px;margin:0;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}\n.ds-state-label{display:inline-flex;align-items:center;justify-content:center;height:26px;min-width:46px;padding:0 8px;border-radius:0;background:transparent;cursor:pointer;transition:color 150ms cubic-bezier(0.4,0,0.2,1),background-color 150ms cubic-bezier(0.4,0,0.2,1);}\n.ds-state-label:hover,.ds-state-radio:checked+.ds-state-label{background:var(--muted,oklch(0.269 0 0));color:var(--foreground,oklch(0.985 0 0));}\n.ds-state-radio:focus-visible+.ds-state-label{box-shadow:0 0 0 3px color-mix(in oklab,var(--ring,oklch(0.556 0 0)) 50%,transparent);}\n.ds-state-radio:disabled+.ds-state-label{pointer-events:none;opacity:.5;}\n@media(max-width:680px),(pointer:coarse){.ds-state-format{height:50px;}.ds-state-label{height:44px;min-width:44px;}}\n@media(max-width:680px){.ds-state-format{font-size:16px;}}\n@media(prefers-reduced-motion:reduce){.ds-state-label{transition:none;}}"
+    },
+    {
+      "name": "Question disclosure",
+      "kind": "custom",
+      "refersTo": "question-disclosure",
+      "description": "A native expandable question with an always-visible remove affordance. Expansion works in this preview; removal is visual only and has no handler.",
+      "html": "<div class=\"ds-question\"><details class=\"ds-question-details\"><summary class=\"ds-question-summary\"><code>priority</code><span class=\"ds-question-badge\">Choice</span><svg class=\"ds-question-chevron\" xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"/></svg></summary><div class=\"ds-question-content\"><label class=\"ds-question-label\" for=\"ds-question-id\">Question ID</label><input class=\"ds-question-input\" id=\"ds-question-id\" value=\"priority\" /></div></details><button class=\"ds-question-remove\" type=\"button\" aria-label=\"Remove question priority\" title=\"Remove question (visual preview)\"><svg class=\"ds-icon\" xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M10 11v6\"/><path d=\"M14 11v6\"/><path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\"/><path d=\"M3 6h18\"/><path d=\"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\"/></svg></button></div>",
+      "css": ".ds-question{position:relative;min-width:0;border:1px solid var(--border,oklch(1 0 0 / 10%));border-radius:4px;background:var(--background,oklch(0.145 0 0));color:var(--foreground,oklch(0.985 0 0));font:400 14px/1.5 'Inter Variable',sans-serif;}\n.ds-question-summary{display:flex;align-items:center;gap:10px;min-height:40px;padding:6px 44px 6px 10px;list-style:none;cursor:pointer;}\n.ds-question-summary::-webkit-details-marker{display:none;}\n.ds-question-summary:focus-visible{outline-offset:4px;}\n.ds-question-summary code{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:400 13px/1.5 ui-monospace,'SFMono-Regular',Consolas,monospace;}\n.ds-question-badge{display:inline-flex;align-items:center;height:20px;padding:2px 8px;border:1px solid var(--border,oklch(1 0 0 / 10%));border-radius:0;font:400 11px/1.333333 'Inter Variable',sans-serif;white-space:nowrap;}\n.ds-question-chevron{width:14px;height:14px;flex-shrink:0;color:var(--muted-foreground,oklch(0.708 0 0));}\n.ds-question-details[open] .ds-question-chevron{transform:rotate(180deg);}\n.ds-question-content{padding:4px 12px 12px;}\n.ds-question-label{display:block;margin-bottom:6px;color:var(--muted-foreground,oklch(0.708 0 0));font-size:12px;}\n.ds-question-input{width:100%;min-width:0;height:32px;min-height:32px;padding:4px 10px;border:1px solid var(--input,oklch(1 0 0 / 15%));border-radius:3px;background:color-mix(in oklab,var(--input,oklch(1 0 0 / 15%)) 30%,transparent);color:var(--foreground,oklch(0.985 0 0));font:400 14px/1.5 'Inter Variable',sans-serif;outline:none;transition:color 150ms cubic-bezier(0.4,0,0.2,1),background-color 150ms cubic-bezier(0.4,0,0.2,1),border-color 150ms cubic-bezier(0.4,0,0.2,1);}\n.ds-question-input:focus-visible{border-color:var(--ring,oklch(0.556 0 0));box-shadow:0 0 0 1px color-mix(in oklab,var(--ring,oklch(0.556 0 0)) 50%,transparent);}\n.ds-question-remove{position:absolute;top:4px;right:4px;display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;padding:0;border:1px solid transparent;border-radius:0;background:transparent;color:var(--muted-foreground,oklch(0.708 0 0));cursor:pointer;outline:none;transition:all 150ms cubic-bezier(0.4,0,0.2,1);}\n.ds-question-remove svg{width:16px;height:16px;pointer-events:none;}\n.ds-question-remove:hover{background:color-mix(in oklab,var(--muted,oklch(0.269 0 0)) 50%,transparent);color:var(--destructive,oklch(0.704 0.191 22.216));}\n.ds-question-remove:focus-visible{border-color:var(--ring,oklch(0.556 0 0));box-shadow:0 0 0 1px color-mix(in oklab,var(--ring,oklch(0.556 0 0)) 50%,transparent);}\n.ds-question-remove:active{transform:translateY(1px);}\n:host-context(.light) .ds-question-input{background:transparent;}\n:host-context(.light) .ds-question-remove:hover{background:var(--muted,oklch(0.269 0 0));}\n@media(max-width:680px),(pointer:coarse){.ds-question-summary{min-height:48px;padding-right:52px;}.ds-question-remove{top:2px;right:2px;width:44px;height:44px;}.ds-question-input{min-height:44px;}}\n@media(max-width:680px){.ds-question-summary code{font-size:12px;}.ds-question-badge{font-size:10px;}.ds-question-input{font-size:16px;}}\n@media(prefers-reduced-motion:reduce){.ds-question-input,.ds-question-remove{transition:none;}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Decision Workbench",
+    "overview": "Kimeru is compact, precise, and restrained. Neutral surfaces keep structured inputs and results prominent; selective Deep Rose accents identify primary actions, active navigation, and data. Inter provides a consistent working voice, with monospace reserved for code, identifiers, and machine-readable values.\n\nThe system feels like a set of precise tools: square controls, shallow container corners, thin separators, and flat tonal layers. Dark is the default, and the Paper light theme carries the same hierarchy and density. Use the existing 決 artwork with the lowercase wordmark; asset provenance and provider marks remain governed by [brand-spec.md](brand-spec.md).",
+    "keyCharacteristics": [
+      "Compact desktop controls with larger touch targets.",
+      "Charcoal or Paper surfaces with selective Deep Rose accents.",
+      "Flat, bordered containers and familiar form controls.",
+      "Clear separation of prose, code, and quantitative results.",
+      "Persistent navigation that can reduce to an accessible icon rail."
+    ],
+    "rules": [
+      {
+        "name": "The Semantic Color Rule",
+        "body": "Apply runtime semantic variables so surfaces, controls, and overlays change together between themes. The paired frontmatter colors document their values; they are not a reason to hardcode a dark color into a component.",
+        "section": "colors"
+      },
+      {
+        "name": "The Code Boundary Rule",
+        "body": "Use monospace for JSON, question IDs, model IDs, URLs, and numeric machine values. Keep explanations and action labels in Inter.",
+        "section": "typography"
+      },
+      {
+        "name": "The Density Rule",
+        "body": "Keep ordinary desktop controls at a 32px minimum height. At 680px and below, or with a coarse pointer, raise those controls to 44px. Grow the containing tracks too: Text/JSON and result tabs use 50px tracks around 44px targets. Authentication fields use 36px on desktop and 44px for touch.",
+        "section": "layout"
+      }
+    ],
+    "dos": [
+      "**Do** reuse semantic colors and verify the same component in dark and light themes.",
+      "**Do** preserve compact desktop spacing while keeping touch controls and their tracks large enough.",
+      "**Do** retain names and visible focus states when navigation or tools become icon-only.",
+      "**Do** use existing dropdowns, tabs, and single-selection controls for their established roles.",
+      "**Do** keep question removal available in the collapsed row.",
+      "**Do** preserve labels, numeric values, and image alignment in result visualizations."
+    ],
+    "donts": [
+      "**Don't** replace square primitives with large rounded controls or shadowed cards.",
+      "**Don't** enlarge global control minima without checking nested tabs and segmented tracks.",
+      "**Don't** treat the preset's base radius or tiny metadata exceptions as universal defaults.",
+      "**Don't** replace supplied brand/provider assets with decorative Unicode symbols.",
+      "**Don't** use color alone to distinguish quantitative results or imply that confidence is answer probability."
+    ]
+  }
+}
