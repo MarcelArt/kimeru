@@ -46,6 +46,8 @@ The product applies the saved-provider and workspace model familiar from Open We
 
 Preserve the name Kimeru and the user-approved direction recorded in `direction-approved.md`: “the styling of C but the layout of A.” The binding implementation constraint is the official shadcn preset `b50cyVY3s`, with A's persistent library and split editor/results layout and C's dark styling. These are existing commitments, not a new visual direction established by this record.
 
+Users can also choose the preset's light theme; dark remains the default. Desktop navigation can collapse to an icon rail. Theme and sidebar preferences are saved in the browser, while mobile navigation opens as a fully labeled drawer.
+
 Use the user-selected kanji 決 for the application logo and icon alongside the lowercase Kimeru wordmark. Asset provenance and provider identification rules are recorded in `brand-spec.md` and `design-demos/assets/sources.md`.
 
 ## Evidence on Hand

@@ -19,6 +19,9 @@ import {
   Trash2,
   Download,
   CircleHelp,
+  PanelLeftClose,
+  PanelLeftOpen,
+  FileText,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "#/components/ui/button";
@@ -62,6 +65,7 @@ import { Connections } from "./Connections";
 import { Administration, PasswordDialog } from "./Administration";
 import { Modal, Picker, errorMessage, downloadJson } from "./shared";
 import { prepareImage } from "./images";
+import { ThemeToggle } from "./ThemeToggle";
 
 type View = "playground" | "history" | "connections" | "admin";
 function blankInput(workspace: Workspace | null): DecisionInput {
@@ -103,6 +107,7 @@ export function App({
   const [customModelOpen, setCustomModelOpen] = useState(false);
   const [customModel, setCustomModel] = useState("");
   const [mobileNav, setMobileNav] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{
@@ -113,6 +118,21 @@ export function App({
   const [deleting, setDeleting] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const menuTrigger = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    try {
+      setSidebarCollapsed(
+        window.localStorage.getItem("kimeru-sidebar-collapsed") === "true",
+      );
+    } catch {
+      // Navigation remains usable when browser storage is unavailable.
+    }
+    function syncSidebar(event: StorageEvent) {
+      if (event.key === "kimeru-sidebar-collapsed" || event.key === null)
+        setSidebarCollapsed(event.newValue === "true");
+    }
+    window.addEventListener("storage", syncSidebar);
+    return () => window.removeEventListener("storage", syncSidebar);
+  }, []);
   useEffect(() => {
     const desktop = window.matchMedia("(min-width: 681px)");
     const closeOnDesktop = () => {
@@ -167,6 +187,15 @@ export function App({
   function navigate(next: View) {
     setView(next);
     setMobileNav(false);
+  }
+  function toggleSidebar() {
+    const collapsed = !sidebarCollapsed;
+    setSidebarCollapsed(collapsed);
+    try {
+      window.localStorage.setItem("kimeru-sidebar-collapsed", String(collapsed));
+    } catch {
+      // The current session can still change the sidebar without persistence.
+    }
   }
   function newPlayground() {
     setDraft(blankInput(workspace));
@@ -417,8 +446,9 @@ export function App({
   ];
   const navigationContent = (
     <>
-      <div className="brand">
-        <img className="brand-mark" src="/brand/kimeru.svg" alt="" width={24} height={24} />kimeru
+      <div className="brand" aria-label="Kimeru">
+        <img className="brand-mark" src="/brand/kimeru.svg" alt="" width={24} height={24} />
+        <span className="sidebar-label">kimeru</span>
         <Button
           className="mobile-nav-close"
           variant="ghost"
@@ -432,11 +462,13 @@ export function App({
       <Button
         variant="outline"
         className="new-playground-button"
+        aria-label="New playground"
+        title="New playground"
         onClick={newPlayground}
         disabled={running}
       >
         <Plus data-icon="inline-start" />
-        New playground
+        <span className="sidebar-label">New playground</span>
       </Button>
       <nav className="primary-nav" aria-label="Workspace">
         {navigation.map((item) => (
@@ -444,10 +476,12 @@ export function App({
             className={cn("nav-link", view === item.id && "active")}
             key={item.id}
             aria-current={view === item.id ? "page" : undefined}
+            aria-label={item.title}
+            title={item.title}
             onClick={() => navigate(item.id)}
           >
             <item.icon />
-            {item.title}
+            <span className="sidebar-label">{item.title}</span>
           </button>
         ))}
       </nav>
@@ -470,8 +504,15 @@ export function App({
                 disabled={running}
                 onClick={() => openPlayground(playground)}
                 title={playground.title}
+                aria-label={playground.title}
+                aria-current={
+                  playgroundId === playground.id && view === "playground"
+                    ? "page"
+                    : undefined
+                }
               >
-                {playground.title}
+                <FileText className="library-icon" aria-hidden="true" />
+                <span className="sidebar-label">{playground.title}</span>
               </button>
               <Button
                 variant="ghost"
@@ -494,43 +535,56 @@ export function App({
           <p className="library-empty">Saved playgrounds will appear here.</p>
         )}
       </div>
-      <button className="example-link" onClick={example} disabled={running}>
+      <button
+        className="example-link"
+        aria-label="Load example inputs"
+        title="Load example inputs"
+        onClick={example}
+        disabled={running}
+      >
         <Plus />
-        Load example inputs
+        <span className="sidebar-label">Load example inputs</span>
       </button>
       <div className="sidebar-bottom">
         {user.role === "admin" && (
           <button
             className={cn("nav-link", view === "admin" && "active")}
+            aria-label="Administration"
+            title="Administration"
+            aria-current={view === "admin" ? "page" : undefined}
             onClick={() => navigate("admin")}
           >
             <ShieldCheck />
-            Administration
+            <span className="sidebar-label">Administration</span>
           </button>
         )}
         <button
           className="nav-link"
+          aria-label="About this workspace"
+          title="About this workspace"
           onClick={() => {
             setMobileNav(false);
             setHelpOpen(true);
           }}
         >
           <CircleHelp />
-          About this workspace
+          <span className="sidebar-label">About this workspace</span>
         </button>
         <button
           className="nav-link"
+          aria-label="Change password"
+          title="Change password"
           onClick={() => {
             setMobileNav(false);
             setPasswordOpen(true);
           }}
         >
           <KeyRound />
-          Change password
+          <span className="sidebar-label">Change password</span>
         </button>
         <div className="account-row">
           <span className="avatar">{user.name.slice(0, 2).toUpperCase()}</span>
-          <div>
+          <div className="account-details">
             <strong>{user.name}</strong>
             <span>
               {user.role === "admin" ? "Administrator" : "Personal workspace"}
@@ -540,6 +594,7 @@ export function App({
             variant="ghost"
             size="icon"
             aria-label="Sign out"
+            title="Sign out"
             onClick={signOut}
           >
             <LogOut />
@@ -549,11 +604,13 @@ export function App({
     </>
   );
   return (
-    <div className="application">
-      <aside className="app-sidebar desktop-sidebar">{navigationContent}</aside>
+    <div className="application" data-sidebar-collapsed={sidebarCollapsed}>
+      <aside id="workspace-sidebar" className="app-sidebar desktop-sidebar">
+        {navigationContent}
+      </aside>
       <Dialog open={mobileNav} onOpenChange={setMobileNav}>
         <DialogContent
-          className="mobile-navigation"
+          className="mobile-navigation top-0 left-0 translate-x-0 translate-y-0"
           showCloseButton={false}
           onCloseAutoFocus={(event) => {
             event.preventDefault();
@@ -571,6 +628,20 @@ export function App({
       <main className="app-main">
         <header className="app-topbar">
           <div className="breadcrumb">
+            <Button
+              className="sidebar-toggle"
+              variant="ghost"
+              size="icon"
+              aria-label={
+                sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"
+              }
+              title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              aria-controls="workspace-sidebar"
+              aria-expanded={!sidebarCollapsed}
+              onClick={toggleSidebar}
+            >
+              {sidebarCollapsed ? <PanelLeftOpen /> : <PanelLeftClose />}
+            </Button>
             <Button
               ref={menuTrigger}
               className="mobile-menu-button"
@@ -595,10 +666,13 @@ export function App({
                     : "Administration"}
             </span>
           </div>
-          <Badge variant="outline">
-            <LockKeyhole />
-            Private workspace
-          </Badge>
+          <div className="topbar-actions">
+            <Badge variant="outline">
+              <LockKeyhole />
+              Private workspace
+            </Badge>
+            <ThemeToggle />
+          </div>
         </header>
         {view === "connections" ? (
           <Connections

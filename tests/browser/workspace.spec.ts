@@ -89,6 +89,10 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
   const baseUrl = `http://127.0.0.1:${(provider.address() as AddressInfo).port}`;
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
+  page.on("console", (message) => {
+    if (message.type() === "error" && /hydrat|server rendered HTML/i.test(message.text()))
+      errors.push(message.text());
+  });
   let savedRunUrl = "";
   page.on("request", (request) => {
     if (request.url().includes("_serverFn/") && request.method() === "GET")
@@ -248,6 +252,105 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
       path: ".verification/workspace-desktop-viewport.png",
       animations: "disabled",
     });
+    const application = page.locator(".application");
+    const desktopSidebar = page.locator("#workspace-sidebar");
+    const expandedSidebarWidth = await desktopSidebar.evaluate(
+      (sidebar) => sidebar.getBoundingClientRect().width,
+    );
+    const darkBackground = await page
+      .locator("body")
+      .evaluate((body) => getComputedStyle(body).backgroundColor);
+    await expect(page.locator("html")).toHaveClass(/\bdark\b/);
+    const collapseSidebar = page.getByRole("button", {
+      name: "Collapse sidebar",
+      exact: true,
+    });
+    await collapseSidebar.focus();
+    await collapseSidebar.press("Enter");
+    await expect(application).toHaveAttribute("data-sidebar-collapsed", "true");
+    await expect
+      .poll(() =>
+        desktopSidebar.evaluate(
+          (sidebar) => sidebar.getBoundingClientRect().width,
+        ),
+      )
+      .toBeLessThan(expandedSidebarWidth / 2);
+    await page.screenshot({
+      path: ".verification/workspace-dark-collapsed.png",
+      animations: "disabled",
+    });
+    // Icon-only controls retain their accessible names and active-page state.
+    const connectionsNav = desktopSidebar.getByRole("button", {
+      name: "Connections",
+      exact: true,
+    });
+    await connectionsNav.focus();
+    await connectionsNav.press("Enter");
+    await expect(connectionsNav).toHaveAttribute("aria-current", "page");
+    await expect(
+      page.getByRole("heading", { name: "Connections", exact: true }),
+    ).toBeVisible();
+    const playgroundNav = desktopSidebar.getByRole("button", {
+      name: "Playground",
+      exact: true,
+    });
+    await playgroundNav.click();
+    await expect(playgroundNav).toHaveAttribute("aria-current", "page");
+    await expect(page.locator(".answer-block")).toHaveCount(4);
+    await page
+      .getByRole("button", { name: "Switch to light theme", exact: true })
+      .click();
+    await expect(page.locator("html")).toHaveClass(/\blight\b/);
+    await expect
+      .poll(() =>
+        page
+          .locator("body")
+          .evaluate((body) => getComputedStyle(body).backgroundColor),
+      )
+      .not.toBe(darkBackground);
+    await expect(page.locator("[data-sonner-toaster]")).toHaveAttribute(
+      "data-sonner-theme",
+      "light",
+    );
+    await page.screenshot({
+      path: ".verification/workspace-light-collapsed.png",
+      animations: "disabled",
+    });
+    const expandSidebar = page.getByRole("button", {
+      name: "Expand sidebar",
+      exact: true,
+    });
+    await expandSidebar.focus();
+    await expandSidebar.press("Enter");
+    await expect(application).toHaveAttribute(
+      "data-sidebar-collapsed",
+      "false",
+    );
+    await expect
+      .poll(() =>
+        desktopSidebar.evaluate(
+          (sidebar) => sidebar.getBoundingClientRect().width,
+        ),
+      )
+      .toBeGreaterThan(expandedSidebarWidth - 1);
+    await page.screenshot({
+      path: ".verification/workspace-light-expanded.png",
+      animations: "disabled",
+    });
+    await connectionsNav.click();
+    await page
+      .getByRole("button", { name: "Add connection", exact: true })
+      .click();
+    await expect(
+      page.getByRole("dialog", { name: "Add connection", exact: true }),
+    ).toBeVisible();
+    await page.screenshot({
+      path: ".verification/workspace-light-connection-dialog.png",
+      animations: "disabled",
+    });
+    await page.keyboard.press("Escape");
+    await playgroundNav.click();
+    await collapseSidebar.click();
     await page.setViewportSize({ width: 1024, height: 900 });
     await expectContainedStateControl();
     expect(
@@ -266,6 +369,25 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
     await expect(
       page.getByRole("button", { name: "Run history", exact: true }),
     ).toBeVisible();
+    const mobileNavigation = page.getByRole("dialog", {
+      name: "Workspace navigation",
+      exact: true,
+    });
+    await expect(mobileNavigation).toBeVisible();
+    await expect.poll(async () => {
+      const box = await mobileNavigation.boundingBox();
+      return !!box && Math.abs(box.x) < 1 && Math.abs(box.y) < 1 &&
+        box.width >= 250 && box.width <= 375 && box.height >= 811;
+    }).toBe(true);
+    expect(
+      await mobileNavigation
+        .getByRole("button", { name: "Run history", exact: true })
+        .innerText(),
+    ).toContain("Run history");
+    await page.screenshot({
+      path: ".verification/workspace-light-mobile-drawer.png",
+      animations: "disabled",
+    });
     await page.keyboard.press("Escape");
     await page.screenshot({
       path: ".verification/workspace-mobile.png",
@@ -287,6 +409,11 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
     await page.locator(".history-main").click();
     await expect(page.locator(".answer-block")).toHaveCount(4);
     await page.reload();
+    await expect(page.locator("html")).toHaveClass(/\blight\b/);
+    await expect(application).toHaveAttribute("data-sidebar-collapsed", "true");
+    await expect(
+      page.getByRole("button", { name: "Expand sidebar", exact: true }),
+    ).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Product listing review", exact: true }),
     ).toBeVisible();
@@ -342,6 +469,7 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
     await expect(page.getByRole("dialog")).toHaveCount(0);
     const memberContext = await browser.newContext();
     const member = await memberContext.newPage();
+    member.on("pageerror", (error) => errors.push(error.message));
     await member.goto("http://127.0.0.1:4176/");
     await expect(
       member.getByRole("button", { name: "Create administrator", exact: true }),
@@ -433,11 +561,9 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
         exact: false,
       }),
     ).toBeVisible();
-    const boxQuestion = member
-      .locator("details")
-      .filter({
-        has: member.locator("summary code", { hasText: "product_region" }),
-      });
+    const boxQuestion = member.locator("details").filter({
+      has: member.locator("summary code", { hasText: "product_region" }),
+    });
     await expect(boxQuestion).not.toHaveAttribute("open");
     await member
       .getByRole("button", {
@@ -462,10 +588,31 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
     expect(clefRequest.headers.authorization).toBe("Bearer true");
     expect(clefRequest.body.images).toHaveLength(1);
     expect(clefRequest.body.assets).toBeUndefined();
+    await member
+      .getByRole("button", { name: "Switch to light theme", exact: true })
+      .click();
+    await expect(member.locator("html")).toHaveClass(/\blight\b/);
+    await expect(member.locator("[data-sonner-toaster]")).toHaveAttribute(
+      "data-sonner-theme",
+      "light",
+    );
     await member.getByRole("button", { name: "Sign out", exact: true }).click();
     await expect(
       member.getByRole("button", { name: "Sign in", exact: true }),
     ).toBeVisible();
+    await member.reload();
+    await expect(member.locator("html")).toHaveClass(/\blight\b/);
+    await expect(
+      member.getByRole("button", { name: "Switch to dark theme", exact: true }),
+    ).toBeVisible();
+    await member.screenshot({
+      path: ".verification/sign-in-light.png",
+      animations: "disabled",
+    });
+    await member
+      .getByRole("button", { name: "Switch to dark theme", exact: true })
+      .click();
+    await expect(member.locator("html")).toHaveClass(/\bdark\b/);
     await memberContext.close();
     expect(errors).toEqual([]);
   } finally {

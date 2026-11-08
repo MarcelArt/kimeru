@@ -6,6 +6,7 @@ import { Field, FieldGroup, FieldLabel } from "#/components/ui/field";
 import { Alert, AlertDescription } from "#/components/ui/alert";
 import { login, registerFirstAdmin } from "#/server/api";
 import { errorMessage } from "./shared";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function AuthScreen({
   needsSetup,
@@ -38,6 +39,7 @@ export function AuthScreen({
     <div className="auth-page">
       <div className="auth-brand">
         <img className="brand-mark" src="/brand/kimeru.svg" alt="" width={24} height={24} /> kimeru
+        <ThemeToggle className="auth-theme-toggle" />
       </div>
       <main className="auth-card">
         <div className="auth-emblem">
