@@ -94,6 +94,31 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
     if (request.url().includes("_serverFn/") && request.method() === "GET")
       savedRunUrl = request.url();
   });
+  const stateFormat = page.getByRole("radiogroup", { name: "State format" });
+  async function expectContainedStateControl(minimumTargetHeight = 0) {
+    await expect(stateFormat).toBeVisible();
+    const geometry = await stateFormat.evaluate((group) => {
+      const bounds = group.getBoundingClientRect();
+      return Array.from(group.querySelectorAll('[role="radio"]')).map(
+        (control) => {
+          const rect = control.getBoundingClientRect();
+          return {
+            contained:
+              rect.left >= bounds.left - 1 &&
+              rect.right <= bounds.right + 1 &&
+              rect.top >= bounds.top - 1 &&
+              rect.bottom <= bounds.bottom + 1,
+            height: rect.height,
+          };
+        },
+      );
+    });
+    expect(geometry).toHaveLength(2);
+    for (const control of geometry) {
+      expect(control.contained).toBe(true);
+      expect(control.height).toBeGreaterThanOrEqual(minimumTargetHeight);
+    }
+  }
   try {
     await page.goto("/");
     await expect(
@@ -133,13 +158,65 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
     await expect(page.getByLabel("Playground title")).toHaveValue(
       "Product listing review",
     );
+    const textFormat = stateFormat.getByRole("radio", {
+      name: "Text",
+      exact: true,
+    });
+    const jsonFormat = stateFormat.getByRole("radio", {
+      name: "JSON",
+      exact: true,
+    });
+    await expect(jsonFormat).toBeChecked();
+    // The selected format cannot be toggled off, and both formats work by keyboard.
+    await jsonFormat.click();
+    await expect(jsonFormat).toBeChecked();
+    await jsonFormat.press("ArrowLeft");
+    await expect(textFormat).toBeFocused();
+    await textFormat.press("Space");
+    await expect(textFormat).toBeChecked();
+    await expect(jsonFormat).not.toBeChecked();
+    await textFormat.press("ArrowRight");
+    await expect(jsonFormat).toBeFocused();
+    await jsonFormat.press("Space");
+    await expect(jsonFormat).toBeChecked();
+    await expect(textFormat).not.toBeChecked();
+    await expectContainedStateControl();
     await page
       .getByRole("button", { name: "Discover models", exact: true })
       .click();
     await expect(
       page.getByText("Found 1 model", { exact: true }),
     ).toBeVisible();
-    await page.getByLabel("Model name", { exact: true }).fill("jev-test");
+    const modelPicker = page.getByRole("combobox", {
+      name: "Model name",
+      exact: true,
+    });
+    await modelPicker.click();
+    mkdirSync(".verification", { recursive: true });
+    await page.screenshot({
+      path: ".verification/workspace-model-menu.png",
+      animations: "disabled",
+    });
+    await page.getByRole("option", { name: "jev-test", exact: true }).click();
+    await expect(modelPicker).toHaveText("jev-test");
+    await modelPicker.click();
+    await page
+      .getByRole("option", { name: "Enter a model name…", exact: true })
+      .click();
+    const modelDialog = page.getByRole("dialog", {
+      name: "Enter a model name",
+      exact: true,
+    });
+    await modelDialog
+      .getByLabel("Model name", { exact: true })
+      .fill("jev-custom-test");
+    await modelDialog
+      .getByRole("button", { name: "Use model", exact: true })
+      .click();
+    await expect(modelDialog).toHaveCount(0);
+    await expect(modelPicker).toHaveText("jev-custom-test");
+    await modelPicker.click();
+    await page.getByRole("option", { name: "jev-test", exact: true }).click();
     await page.getByRole("button", { name: "Save", exact: true }).click();
     await expect(
       page.getByText("Saved playground", { exact: true }),
@@ -162,13 +239,27 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
       "test-secret-never-returned",
     );
     await page.getByRole("tab", { name: "Overview", exact: true }).click();
-    mkdirSync(".verification", { recursive: true });
     await page.screenshot({
       path: ".verification/workspace-desktop.png",
       fullPage: true,
       animations: "disabled",
     });
+    await page.screenshot({
+      path: ".verification/workspace-desktop-viewport.png",
+      animations: "disabled",
+    });
+    await page.setViewportSize({ width: 1024, height: 900 });
+    await expectContainedStateControl();
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBe(1024);
+    await page.screenshot({
+      path: ".verification/workspace-tablet.png",
+      fullPage: true,
+      animations: "disabled",
+    });
     await page.setViewportSize({ width: 375, height: 812 });
+    await expectContainedStateControl(44);
     await page
       .getByRole("button", { name: "Open navigation", exact: true })
       .click();
@@ -179,6 +270,10 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
     await page.screenshot({
       path: ".verification/workspace-mobile.png",
       fullPage: true,
+      animations: "disabled",
+    });
+    await page.screenshot({
+      path: ".verification/workspace-mobile-viewport.png",
       animations: "disabled",
     });
     expect(
@@ -198,6 +293,7 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
     await page
       .getByRole("button", { name: "Product listing review", exact: true })
       .click();
+    await expect(modelPicker).toHaveText("jev-test");
     providerFailure = true;
     await page
       .getByRole("button", { name: "Run questions", exact: true })
@@ -342,10 +438,18 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
       .filter({
         has: member.locator("summary code", { hasText: "product_region" }),
       });
-    await boxQuestion.locator("summary").click();
-    await boxQuestion
-      .getByRole("button", { name: "Remove", exact: true })
+    await expect(boxQuestion).not.toHaveAttribute("open");
+    await member
+      .getByRole("button", {
+        name: "Remove question product_region",
+        exact: true,
+      })
       .click();
+    await expect(boxQuestion).toHaveCount(0);
+    await expect(member.locator(".question-item")).toHaveCount(3);
+    await expect(
+      member.locator("summary").filter({ hasText: "product_present" }),
+    ).toBeFocused();
     await member
       .getByRole("button", { name: "Run questions", exact: true })
       .click();

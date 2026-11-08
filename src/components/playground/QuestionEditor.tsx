@@ -1,4 +1,5 @@
-import { Plus, Trash2, ChevronDown, GripVertical } from "lucide-react";
+import { useId, useLayoutEffect, useRef } from "react";
+import { Plus, Trash2, ChevronDown } from "lucide-react";
 import { Button } from "#/components/ui/button";
 import { Input } from "#/components/ui/input";
 import { Textarea } from "#/components/ui/textarea";
@@ -142,8 +143,25 @@ export function QuestionEditor({
   images: ImageAttachment[];
   onChange: (questions: Question[]) => void;
 }) {
+  const editorId = useId();
+  const addButton = useRef<HTMLButtonElement>(null);
+  const questionTriggers = useRef<Array<HTMLElement | null>>([]);
+  const focusAfterRemoval = useRef<number | null>(null);
+
+  useLayoutEffect(() => {
+    if (focusAfterRemoval.current === null) return;
+    const nextIndex = Math.min(focusAfterRemoval.current, questions.length - 1);
+    const target = questionTriggers.current[nextIndex] || addButton.current;
+    target?.focus();
+    focusAfterRemoval.current = null;
+  }, [questions]);
+
   function change(index: number, question: Question) {
     onChange(questions.map((item, i) => (i === index ? question : item)));
+  }
+  function remove(index: number) {
+    focusAfterRemoval.current = index;
+    onChange(questions.filter((_, i) => i !== index));
   }
   function add() {
     let number = questions.length + 1;
@@ -157,253 +175,258 @@ export function QuestionEditor({
         <h2>
           Questions <span className="count-label">{questions.length}</span>
         </h2>
-        <Button variant="ghost" size="sm" onClick={add}>
+        <Button ref={addButton} variant="ghost" size="sm" onClick={add}>
           <Plus data-icon="inline-start" />
           Add question
         </Button>
       </div>
       <div className="question-stack">
         {questions.map((question, index) => (
-          <details
-            className="question-item"
-            key={index}
-            open={questions.length === 1 ? true : undefined}
-          >
-            <summary>
-              <span className="question-glyph">
-                {question.type === "choice"
-                  ? "◇"
-                  : question.type === "score"
-                    ? "≋"
-                    : question.type === "noul"
-                      ? "◐"
-                      : "□"}
-              </span>
-              <code>{question.id || "Untitled question"}</code>
-              <Badge variant="outline">{QUESTION_LABELS[question.type]}</Badge>
-              <ChevronDown className="disclosure-icon" />
-            </summary>
-            <div className="question-content">
-              <FieldGroup>
-                <div className="question-identity">
+          <div className="question-item" key={index}>
+            <details
+              className="question-disclosure"
+              open={questions.length === 1 ? true : undefined}
+            >
+              <summary
+                className="question-trigger"
+                ref={(element) => {
+                  questionTriggers.current[index] = element;
+                }}
+                aria-controls={`${editorId}-question-${index}`}
+              >
+                <span className="question-glyph">
+                  {question.type === "choice"
+                    ? "◇"
+                    : question.type === "score"
+                      ? "≋"
+                      : question.type === "noul"
+                        ? "◐"
+                        : "□"}
+                </span>
+                <code>{question.id || "Untitled question"}</code>
+                <Badge variant="outline">{QUESTION_LABELS[question.type]}</Badge>
+                <ChevronDown className="disclosure-icon" />
+              </summary>
+              <div
+                className="question-content"
+                id={`${editorId}-question-${index}`}
+              >
+                <FieldGroup>
+                  <div className="question-identity">
+                    <Field>
+                      <FieldLabel htmlFor={`question-name-${index}`}>
+                        Question ID
+                      </FieldLabel>
+                      <Input
+                        id={`question-name-${index}`}
+                        value={question.id}
+                        onChange={(event) =>
+                          change(index, {
+                            ...question,
+                            id: event.target.value.replace(
+                              /[^A-Za-z0-9_.-]/g,
+                              "_",
+                            ),
+                          })
+                        }
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel>Type</FieldLabel>
+                      <Picker
+                        label="Question type"
+                        value={question.type}
+                        onChange={(value) =>
+                          change(
+                            index,
+                            newQuestion(
+                              value as QuestionType,
+                              question.id,
+                              question.instructions,
+                              images[0]?.id,
+                            ),
+                          )
+                        }
+                        options={Object.entries(QUESTION_LABELS).map(
+                          ([value, label]) => ({ value, label }),
+                        )}
+                      />
+                    </Field>
+                  </div>
                   <Field>
-                    <FieldLabel htmlFor={`question-name-${index}`}>
-                      Question ID
+                    <FieldLabel htmlFor={`instructions-${index}`}>
+                      Instructions
                     </FieldLabel>
-                    <Input
-                      id={`question-name-${index}`}
-                      value={question.id}
+                    <Textarea
+                      id={`instructions-${index}`}
+                      value={question.instructions}
                       onChange={(event) =>
                         change(index, {
                           ...question,
-                          id: event.target.value.replace(
-                            /[^A-Za-z0-9_.-]/g,
-                            "_",
-                          ),
+                          instructions: event.target.value,
                         })
                       }
-                    />
-                  </Field>
-                  <Field>
-                    <FieldLabel>Type</FieldLabel>
-                    <Picker
-                      label="Question type"
-                      value={question.type}
-                      onChange={(value) =>
-                        change(
-                          index,
-                          newQuestion(
-                            value as QuestionType,
-                            question.id,
-                            question.instructions,
-                            images[0]?.id,
-                          ),
-                        )
+                      placeholder={
+                        question.type === "noul"
+                          ? "Write a statement whose truth should be evaluated."
+                          : "Describe the decision the model should make."
                       }
-                      options={Object.entries(QUESTION_LABELS).map(
-                        ([value, label]) => ({ value, label }),
-                      )}
+                      rows={3}
                     />
                   </Field>
-                </div>
-                <Field>
-                  <FieldLabel htmlFor={`instructions-${index}`}>
-                    Instructions
-                  </FieldLabel>
-                  <Textarea
-                    id={`instructions-${index}`}
-                    value={question.instructions}
-                    onChange={(event) =>
-                      change(index, {
-                        ...question,
-                        instructions: event.target.value,
-                      })
-                    }
-                    placeholder={
-                      question.type === "noul"
-                        ? "Write a statement whose truth should be evaluated."
-                        : "Describe the decision the model should make."
-                    }
-                    rows={3}
-                  />
-                </Field>
-                {question.type === "choice" && (
-                  <Field>
-                    <FieldLabel>Criteria</FieldLabel>
-                    <ChoiceCriteria
-                      question={question}
-                      change={(next) => change(index, next)}
-                    />
-                  </Field>
-                )}
-                {question.type === "score" && (
-                  <Field>
-                    <FieldLabel>Ordered criteria</FieldLabel>
-                    <FieldDescription>
-                      From lowest to highest. The score is a weighted value
-                      between 0 and {question.criteria.length - 1}.
-                    </FieldDescription>
-                    <div className="score-criteria">
-                      {question.criteria.map((criterion, criterionIndex) => (
-                        <div className="score-row" key={criterionIndex}>
-                          <span className="score-index">{criterionIndex}</span>
-                          <Input
-                            aria-label={`Score level ${criterionIndex}`}
-                            value={criterion}
-                            onChange={(event) =>
-                              change(index, {
-                                ...question,
-                                criteria: question.criteria.map((item, i) =>
-                                  i === criterionIndex
-                                    ? event.target.value
-                                    : item,
-                                ),
-                              })
-                            }
-                          />
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            disabled={question.criteria.length <= 2}
-                            aria-label={`Remove level ${criterionIndex}`}
-                            onClick={() =>
-                              change(index, {
-                                ...question,
-                                criteria: question.criteria.filter(
-                                  (_, i) => i !== criterionIndex,
-                                ),
-                              })
-                            }
-                          >
-                            <Trash2 />
-                          </Button>
-                        </div>
-                      ))}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        disabled={question.criteria.length >= 10}
-                        onClick={() =>
-                          change(index, {
-                            ...question,
-                            criteria: [...question.criteria, ""],
-                          })
-                        }
-                      >
-                        <Plus data-icon="inline-start" />
-                        Add level
-                      </Button>
-                    </div>
-                  </Field>
-                )}
-                {question.type === "noul" && (
-                  <>
+                  {question.type === "choice" && (
                     <Field>
-                      <FieldLabel htmlFor={`true-${index}`}>
-                        True criteria{" "}
-                        <span className="optional-label">optional</span>
-                      </FieldLabel>
-                      <Textarea
-                        id={`true-${index}`}
-                        value={question.criteria?.true || ""}
-                        onChange={(event) =>
-                          change(index, {
-                            ...question,
-                            criteria: {
-                              ...question.criteria,
-                              true: event.target.value,
-                            },
-                          })
-                        }
-                        rows={2}
-                        placeholder="Evidence that makes the statement true"
+                      <FieldLabel>Criteria</FieldLabel>
+                      <ChoiceCriteria
+                        question={question}
+                        change={(next) => change(index, next)}
                       />
                     </Field>
+                  )}
+                  {question.type === "score" && (
                     <Field>
-                      <FieldLabel htmlFor={`false-${index}`}>
-                        False criteria{" "}
-                        <span className="optional-label">optional</span>
-                      </FieldLabel>
-                      <Textarea
-                        id={`false-${index}`}
-                        value={question.criteria?.false || ""}
-                        onChange={(event) =>
-                          change(index, {
-                            ...question,
-                            criteria: {
-                              ...question.criteria,
-                              false: event.target.value,
-                            },
-                          })
+                      <FieldLabel>Ordered criteria</FieldLabel>
+                      <FieldDescription>
+                        From lowest to highest. The score is a weighted value
+                        between 0 and {question.criteria.length - 1}.
+                      </FieldDescription>
+                      <div className="score-criteria">
+                        {question.criteria.map((criterion, criterionIndex) => (
+                          <div className="score-row" key={criterionIndex}>
+                            <span className="score-index">{criterionIndex}</span>
+                            <Input
+                              aria-label={`Score level ${criterionIndex}`}
+                              value={criterion}
+                              onChange={(event) =>
+                                change(index, {
+                                  ...question,
+                                  criteria: question.criteria.map((item, i) =>
+                                    i === criterionIndex
+                                      ? event.target.value
+                                      : item,
+                                  ),
+                                })
+                              }
+                            />
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              disabled={question.criteria.length <= 2}
+                              aria-label={`Remove level ${criterionIndex}`}
+                              onClick={() =>
+                                change(index, {
+                                  ...question,
+                                  criteria: question.criteria.filter(
+                                    (_, i) => i !== criterionIndex,
+                                  ),
+                                })
+                              }
+                            >
+                              <Trash2 />
+                            </Button>
+                          </div>
+                        ))}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          disabled={question.criteria.length >= 10}
+                          onClick={() =>
+                            change(index, {
+                              ...question,
+                              criteria: [...question.criteria, ""],
+                            })
+                          }
+                        >
+                          <Plus data-icon="inline-start" />
+                          Add level
+                        </Button>
+                      </div>
+                    </Field>
+                  )}
+                  {question.type === "noul" && (
+                    <>
+                      <Field>
+                        <FieldLabel htmlFor={`true-${index}`}>
+                          True criteria{" "}
+                          <span className="optional-label">optional</span>
+                        </FieldLabel>
+                        <Textarea
+                          id={`true-${index}`}
+                          value={question.criteria?.true || ""}
+                          onChange={(event) =>
+                            change(index, {
+                              ...question,
+                              criteria: {
+                                ...question.criteria,
+                                true: event.target.value,
+                              },
+                            })
+                          }
+                          rows={2}
+                          placeholder="Evidence that makes the statement true"
+                        />
+                      </Field>
+                      <Field>
+                        <FieldLabel htmlFor={`false-${index}`}>
+                          False criteria{" "}
+                          <span className="optional-label">optional</span>
+                        </FieldLabel>
+                        <Textarea
+                          id={`false-${index}`}
+                          value={question.criteria?.false || ""}
+                          onChange={(event) =>
+                            change(index, {
+                              ...question,
+                              criteria: {
+                                ...question.criteria,
+                                false: event.target.value,
+                              },
+                            })
+                          }
+                          rows={2}
+                          placeholder="Evidence that makes the statement false"
+                        />
+                        <FieldDescription>
+                          Noul returns a probability, not a thresholded yes or no.
+                        </FieldDescription>
+                      </Field>
+                    </>
+                  )}
+                  {question.type === "box" && (
+                    <Field>
+                      <FieldLabel>Target image</FieldLabel>
+                      <Picker
+                        label="Choose target image"
+                        value={question.targetImageId}
+                        onChange={(value) =>
+                          change(index, { ...question, targetImageId: value })
                         }
-                        rows={2}
-                        placeholder="Evidence that makes the statement false"
+                        options={images.map((image) => ({
+                          value: image.id,
+                          label: image.name,
+                        }))}
                       />
                       <FieldDescription>
-                        Noul returns a probability, not a thresholded yes or no.
+                        The rectangle is drawn on this image. Box does not confirm
+                        that an object is present.
                       </FieldDescription>
                     </Field>
-                  </>
-                )}
-                {question.type === "box" && (
-                  <Field>
-                    <FieldLabel>Target image</FieldLabel>
-                    <Picker
-                      label="Choose target image"
-                      value={question.targetImageId}
-                      onChange={(value) =>
-                        change(index, { ...question, targetImageId: value })
-                      }
-                      options={images.map((image) => ({
-                        value: image.id,
-                        label: image.name,
-                      }))}
-                    />
-                    <FieldDescription>
-                      The rectangle is drawn on this image. Box does not confirm
-                      that an object is present.
-                    </FieldDescription>
-                  </Field>
-                )}
-                <div className="question-footer">
-                  <span>
-                    <GripVertical />
-                    {QUESTION_LABELS[question.type]} question
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                      onChange(questions.filter((_, i) => i !== index))
-                    }
-                  >
-                    <Trash2 data-icon="inline-start" />
-                    Remove
-                  </Button>
-                </div>
-              </FieldGroup>
-            </div>
-          </details>
+                  )}
+                </FieldGroup>
+              </div>
+            </details>
+            <Button
+              type="button"
+              className="question-remove"
+              variant="ghost"
+              size="icon"
+              aria-label={`Remove question ${question.id || "Untitled question"}`}
+              title="Remove question"
+              onClick={() => remove(index)}
+            >
+              <Trash2 />
+            </Button>
+          </div>
         ))}
       </div>
       {questions.length === 0 && (

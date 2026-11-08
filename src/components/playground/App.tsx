@@ -33,7 +33,7 @@ import {
 } from "#/components/ui/dialog";
 import { Alert, AlertDescription } from "#/components/ui/alert";
 import { Field, FieldGroup, FieldLabel } from "#/components/ui/field";
-import { Tabs, TabsList, TabsTrigger } from "#/components/ui/tabs";
+import { ToggleGroup, ToggleGroupItem } from "#/components/ui/toggle-group";
 import { cn } from "#/lib/utils";
 import { DEFAULT_MODELS } from "#/lib/domain";
 import type {
@@ -100,6 +100,8 @@ export function App({
   const [uploading, setUploading] = useState(false);
   const [models, setModels] = useState<string[]>([]);
   const [discovering, setDiscovering] = useState(false);
+  const [customModelOpen, setCustomModelOpen] = useState(false);
+  const [customModel, setCustomModel] = useState("");
   const [mobileNav, setMobileNav] = useState(false);
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
@@ -122,6 +124,13 @@ export function App({
   const connection = workspace?.connections.find(
     (item) => item.id === draft.connectionId,
   );
+  const modelOptions = Array.from(
+    new Set([
+      ...models,
+      ...(connection ? DEFAULT_MODELS[connection.kind] : []),
+      draft.model,
+    ]),
+  ).filter(Boolean);
   const incompatible =
     connection?.kind === "cloudflare" &&
     draft.questions.some((question) => question.type === "box");
@@ -680,29 +689,32 @@ export function App({
                 </Badge>
               )}
               <div className="model-picker">
-                <Input
-                  aria-label="Model name"
-                  list="model-options"
-                  value={draft.model}
-                  onChange={(event) => edit({ model: event.target.value })}
-                  disabled={running}
-                  placeholder="Model name"
+                <Picker
+                  label="Model name"
+                  value={draft.model ? `model:${draft.model}` : ""}
+                  onChange={(value) => {
+                    if (value === "custom") {
+                      setCustomModel(draft.model);
+                      setCustomModelOpen(true);
+                    } else {
+                      edit({ model: value.slice("model:".length) });
+                    }
+                  }}
+                  disabled={running || !connection}
+                  options={[
+                    ...modelOptions.map((model) => ({
+                      value: `model:${model}`,
+                      label: model,
+                    })),
+                    { value: "custom", label: "Enter a model name…" },
+                  ]}
                 />
-                <datalist id="model-options">
-                  {Array.from(
-                    new Set([
-                      ...models,
-                      ...(connection ? DEFAULT_MODELS[connection.kind] : []),
-                    ]),
-                  ).map((model) => (
-                    <option key={model} value={model} />
-                  ))}
-                </datalist>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={discover}
                   aria-label="Discover models"
+                  title="Refresh model list"
                   disabled={!connection || discovering || running}
                 >
                   <RefreshCw className={cn(discovering && "animate-spin")} />
@@ -763,17 +775,21 @@ export function App({
                         <FieldLabel htmlFor="state-input">
                           <h2>State</h2>
                         </FieldLabel>
-                        <Tabs
+                        <ToggleGroup
+                          type="single"
+                          spacing={0}
+                          className="state-format-control"
+                          aria-label="State format"
                           value={draft.stateFormat}
-                          onValueChange={(value) =>
-                            edit({ stateFormat: value as "json" | "text" })
-                          }
+                          disabled={running}
+                          onValueChange={(value) => {
+                            if (value === "text" || value === "json")
+                              edit({ stateFormat: value });
+                          }}
                         >
-                          <TabsList>
-                            <TabsTrigger value="text">Text</TabsTrigger>
-                            <TabsTrigger value="json">JSON</TabsTrigger>
-                          </TabsList>
-                        </Tabs>
+                          <ToggleGroupItem value="text">Text</ToggleGroupItem>
+                          <ToggleGroupItem value="json">JSON</ToggleGroupItem>
+                        </ToggleGroup>
                       </div>
                       <Textarea
                         id="state-input"
@@ -901,6 +917,48 @@ export function App({
         open={passwordOpen}
         onClose={() => setPasswordOpen(false)}
       />
+      <Modal
+        open={customModelOpen}
+        onClose={() => setCustomModelOpen(false)}
+        title="Enter a model name"
+        description="Use the exact model ID supported by your provider."
+      >
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            const model = customModel.trim();
+            if (!model) return;
+            edit({ model });
+            setCustomModelOpen(false);
+          }}
+        >
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor="custom-model-name">Model name</FieldLabel>
+              <Input
+                id="custom-model-name"
+                value={customModel}
+                onChange={(event) => setCustomModel(event.target.value)}
+                autoComplete="off"
+                spellCheck={false}
+                required
+              />
+            </Field>
+            <div className="modal-actions">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setCustomModelOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={!customModel.trim()}>
+                Use model
+              </Button>
+            </div>
+          </FieldGroup>
+        </form>
+      </Modal>
       <Modal
         open={helpOpen}
         onClose={() => setHelpOpen(false)}
