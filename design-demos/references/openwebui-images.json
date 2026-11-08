@@ -1,0 +1,126 @@
+[
+  {
+    "alt": "logo",
+    "src": "https://openwebui.com/logo.png"
+  },
+  {
+    "alt": "Open WebUI v0.11.0: The Interface, Reorganized",
+    "src": "https://community.s3.openwebui.com/uploads/users/6ddf0023-1d2a-4af3-bbbe-41612061a0d8/2026/07/f40b37eb-cebd-43c2-b72f-b0af96413007.png"
+  },
+  {
+    "alt": "Same content in a rebuilt sidebar: v0.10.2 (left) vs v0.11.0 (right). Note the add buttons on the section headers.",
+    "src": "https://community.s3.openwebui.com/uploads/users/6ddf0023-1d2a-4af3-bbbe-41612061a0d8/2026/07/c29605a6-6298-48f5-9e30-dfa661539fc5.png"
+  },
+  {
+    "alt": "The first screen of a fresh install: v0.10.2 (left) and v0.11.0 (right)",
+    "src": "https://community.s3.openwebui.com/uploads/users/6ddf0023-1d2a-4af3-bbbe-41612061a0d8/2026/07/4dde1114-1116-47a8-a53c-aaf80859327b.png"
+  },
+  {
+    "alt": "The same conversation in v0.10.2 (left) and v0.11.0 (right): narrower column, lighter typography, tidier spacing",
+    "src": "https://community.s3.openwebui.com/uploads/users/6ddf0023-1d2a-4af3-bbbe-41612061a0d8/2026/07/d8374695-912b-485f-b57d-d27e155f5757.png"
+  },
+  {
+    "alt": "v0.10.2 user settings modal",
+    "src": "https://community.s3.openwebui.com/uploads/users/6ddf0023-1d2a-4af3-bbbe-41612061a0d8/2026/07/85793f3d-3b60-4077-9c24-87d18af50093.png"
+  },
+  {
+    "alt": "v0.10.2 separate admin panel",
+    "src": "https://community.s3.openwebui.com/uploads/users/6ddf0023-1d2a-4af3-bbbe-41612061a0d8/2026/07/42f70fb1-1604-4291-9baa-a3d75bcd6cfb.png"
+  },
+  {
+    "alt": "v0.11.0 unified settings with the Admin section highlighted",
+    "src": "https://community.s3.openwebui.com/uploads/users/6ddf0023-1d2a-4af3-bbbe-41612061a0d8/2026/07/3c923977-1cd8-4a7e-9919-0ac82e3df385.png"
+  },
+  {
+    "alt": "The new Usage page",
+    "src": "https://community.s3.openwebui.com/uploads/users/6ddf0023-1d2a-4af3-bbbe-41612061a0d8/2026/07/0816fcf5-6da4-42d3-8f6d-dbf4cb762229.png"
+  },
+  {
+    "alt": "The new Notifications section in settings",
+    "src": "https://community.s3.openwebui.com/uploads/users/6ddf0023-1d2a-4af3-bbbe-41612061a0d8/2026/07/fdb3ce71-f4dd-453d-87f0-8ba79221b1be.png"
+  },
+  {
+    "alt": "The Add Notification Target modal: an ID the notify tool can call it by, event subscriptions, and delivery mode",
+    "src": "https://community.s3.openwebui.com/uploads/users/6ddf0023-1d2a-4af3-bbbe-41612061a0d8/2026/07/7f9d2f77-d0df-4ed7-b2b2-30ff61f7ad03.png"
+  },
+  {
+    "alt": "The model picker's old home in the header, and its new one inside the input",
+    "src": "https://community.s3.openwebui.com/uploads/users/6ddf0023-1d2a-4af3-bbbe-41612061a0d8/2026/07/8e7984e5-797c-470e-96ff-3730cfc8a26a.png"
+  },
+  {
+    "alt": "The selector open in both versions: a header dropdown in v0.10.2 and a panel rising from the input in v0.11.0",
+    "src": "https://community.s3.openwebui.com/uploads/users/6ddf0023-1d2a-4af3-bbbe-41612061a0d8/2026/07/0f09b6af-3c74-49b6-afbe-d9f1323ae727.png"
+  },
+  {
+    "alt": "Where the + went: v0.10.2's add-a-model button is now the picker's Compare toggle",
+    "src": "https://community.s3.openwebui.com/uploads/users/6ddf0023-1d2a-4af3-bbbe-41612061a0d8/2026/07/54145cda-1d32-43d9-a4e7-89c1dd41c8fa.png"
+  },
+  {
+    "alt": "Hover a chat and a preview card opens with the conversation's last messages",
+    "src": "https://community.s3.openwebui.com/uploads/users/6ddf0023-1d2a-4af3-bbbe-41612061a0d8/2026/07/0fdb4e08-8cc8-4cb1-a316-6a47ad890b80.png"
+  },
+  {
+    "alt": "A model with variables in its prompt: v0.10.2 shows a plain input, v0.11.0 shows a Chat Variables form with Tone and Audience fields",
+    "src": "https://community.s3.openwebui.com/uploads/users/6ddf0023-1d2a-4af3-bbbe-41612061a0d8/2026/07/68de68f2-15d8-4e12-80fe-0c853d60313e.png"
+  },
+  {
+    "alt": "Chatting with a note: the Experimental panel in v0.10.2 and the full chat experience in v0.11.0",
+    "src": "https://community.s3.openwebui.com/uploads/users/6ddf0023-1d2a-4af3-bbbe-41612061a0d8/2026/07/920358f7-eadd-449e-bc33-1236c8ee16b9.png"
+  },
+  {
+    "alt": "The groups list then and now: governance visible without opening a single group",
+    "src": "https://community.s3.openwebui.com/uploads/users/6ddf0023-1d2a-4af3-bbbe-41612061a0d8/2026/07/e70b6033-9c44-4ce4-8bae-b18c6f6d272a.png"
+  },
+  {
+    "alt": "Hold Shift over the model list: a single hide action in v0.10.2 and four quick actions in v0.11.0",
+    "src": "https://community.s3.openwebui.com/uploads/users/6ddf0023-1d2a-4af3-bbbe-41612061a0d8/2026/07/f2433352-f072-47e2-8bba-97dac756698f.png"
+  },
+  {
+    "alt": "Model defaults before and after: a Settings pop-up in v0.10.2 and an inline Model Defaults panel in v0.11.0",
+    "src": "https://community.s3.openwebui.com/uploads/users/6ddf0023-1d2a-4af3-bbbe-41612061a0d8/2026/07/20e0a7a0-bebb-4e33-8030-97844d25ccf9.png"
+  },
+  {
+    "alt": "The Sub-agents settings page with the feature enabled: concurrency, background execution, iteration and output caps, and a shared system prompt",
+    "src": "https://community.s3.openwebui.com/uploads/users/6ddf0023-1d2a-4af3-bbbe-41612061a0d8/2026/07/b440d358-2f37-40a3-8c9f-591aadd00127.png"
+  },
+  {
+    "alt": "The Prompts workspace before and after: separate buttons and no counts in v0.10.2, a Create menu with tab counts and sortable headers in v0.11.0",
+    "src": "https://community.s3.openwebui.com/uploads/users/6ddf0023-1d2a-4af3-bbbe-41612061a0d8/2026/07/41fa82b6-9b19-4591-8239-f2f058fb7015.png"
+  },
+  {
+    "alt": "Open WebUI",
+    "src": "https://openwebui.com/user.png"
+  },
+  {
+    "alt": "Sovereign AI: Definition, Stack, Examples, and How to Build It with Open WebUI in 2026",
+    "src": "https://community.s3.openwebui.com/uploads/users/6ddf0023-1d2a-4af3-bbbe-41612061a0d8/2026/07/b5fd9317-4217-4f4b-b0b9-8e2347ed94b1.png"
+  },
+  {
+    "alt": "Open WebUI",
+    "src": "https://openwebui.com/user.png"
+  },
+  {
+    "alt": "How Your AI Homelab Scales Into National Infrastructure",
+    "src": "https://community.s3.openwebui.com/uploads/users/6ddf0023-1d2a-4af3-bbbe-41612061a0d8/2026/08/6045fb34-8b4e-457b-a400-bae95d7654ef.png"
+  },
+  {
+    "alt": "Open WebUI",
+    "src": "https://openwebui.com/user.png"
+  },
+  {
+    "alt": "Open WebUI v0.11.1: The Model Learns to Stop and Ask",
+    "src": "https://community.s3.openwebui.com/uploads/users/6ddf0023-1d2a-4af3-bbbe-41612061a0d8/2026/08/263f09fe-6053-4b81-8e56-a12a95a95023.png"
+  },
+  {
+    "alt": "Open WebUI",
+    "src": "https://openwebui.com/user.png"
+  },
+  {
+    "alt": "Open WebUI",
+    "src": "https://openwebui.com/logo.png"
+  },
+  {
+    "alt": "Open WebUI",
+    "src": "https://openwebui.com/logo-dark.png"
+  }
+]

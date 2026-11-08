@@ -1,0 +1,13 @@
+node_modules
+dist
+.git
+.data
+.verification
+.env
+.env.*
+!.env.example
+.agents
+.codex
+.aws
+.huashu-design
+design-demos

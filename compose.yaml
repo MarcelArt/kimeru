@@ -1,0 +1,15 @@
+services:
+  kimeru:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      KIMERU_DATA_DIR: /app/data
+      KIMERU_APP_ORIGIN: ${KIMERU_APP_ORIGIN:-http://localhost:3000}
+      KIMERU_SECURE_COOKIES: ${KIMERU_SECURE_COOKIES:-false}
+      KIMERU_ENCRYPTION_KEY: ${KIMERU_ENCRYPTION_KEY:-}
+    volumes:
+      - kimeru-data:/app/data
+    restart: unless-stopped
+volumes:
+  kimeru-data:
