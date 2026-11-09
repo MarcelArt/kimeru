@@ -49,7 +49,7 @@ export function Picker({
       <SelectTrigger aria-label={label}>
         <SelectValue placeholder={label} />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent position="popper" align="start">
         <SelectGroup>
           {options.map((option) => (
             <SelectItem key={option.value} value={option.value}>
