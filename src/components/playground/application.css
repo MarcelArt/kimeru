@@ -540,6 +540,13 @@ h2 {
 .editor-pane > fieldset > [data-slot="field-group"] > [data-slot="field"] > .section-heading {
   margin-bottom: 0;
 }
+/* The shadcn FieldGroup is an inline-size container, used only by the
+   unused "responsive" Field orientation. Inside the editor's fieldset,
+   Chromium sometimes skips laying out the container's children after a
+   save or playground switch, so the State editor vanishes until reload. */
+[data-slot="field-group"] {
+  container-type: normal;
+}
 .state-editor {
   min-height: 144px;
   resize: vertical;
