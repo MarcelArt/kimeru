@@ -7,6 +7,7 @@ import {
   ShieldCheck,
   Plus,
   Save,
+  CopyPlus,
   Play,
   LoaderCircle,
   ImagePlus,
@@ -318,12 +319,16 @@ export function App({
     closeMobileNav();
     void navigate({ to: "/" });
   }
-  async function save() {
+  /**
+   * Saves the editor's contents. With `asNew`, they become a new playground
+   * and the one they were opened from keeps its saved contents.
+   */
+  async function save(asNew = false) {
     setSaving(true);
     const startedFor = editorSourceRef.current;
     try {
       const saved = await savePlayground({
-        data: { ...draft, id: playgroundId },
+        data: { ...draft, id: asNew ? undefined : playgroundId },
       });
       // Skip if Back or Forward opened something else while saving.
       if (editorSourceRef.current === startedFor) {
@@ -332,7 +337,7 @@ export function App({
         setDirty(false);
       }
       await refresh();
-      toast.success("Playground saved");
+      toast.success(asNew ? "Saved as a new playground" : "Playground saved");
     } catch (error) {
       toast.error(errorMessage(error));
     } finally {
@@ -830,21 +835,35 @@ export function App({
                       : "Give your model context. Ask a useful question."}
                 </p>
               </div>
-              <Button
-                variant="outline"
-                onClick={save}
-                disabled={saving || running}
-              >
-                {saving ? (
-                  <LoaderCircle
-                    data-icon="inline-start"
-                    className="animate-spin"
-                  />
-                ) : (
-                  <Save data-icon="inline-start" />
+              <div className="playground-actions">
+                {playgroundId && (
+                  <Button
+                    variant="outline"
+                    onClick={() => save(true)}
+                    disabled={saving || running}
+                    aria-label="Save as new"
+                    title="Save as a new playground"
+                  >
+                    <CopyPlus data-icon="inline-start" />
+                    <span className="playground-action-label">Save as new</span>
+                  </Button>
                 )}
-                Save
-              </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => save()}
+                  disabled={saving || running}
+                >
+                  {saving ? (
+                    <LoaderCircle
+                      data-icon="inline-start"
+                      className="animate-spin"
+                    />
+                  ) : (
+                    <Save data-icon="inline-start" />
+                  )}
+                  Save
+                </Button>
+              </div>
             </div>
             <div className="connection-toolbar">
               {connection && (

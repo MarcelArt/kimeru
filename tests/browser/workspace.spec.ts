@@ -445,6 +445,29 @@ test("first admin, provider execution, saved work, member privacy, mobile and lo
       page.getByRole("link", { name: "Product listing review", exact: true }),
     ).toHaveAttribute("aria-current", "page");
     await expect(modelPicker).toHaveText("jev-test");
+    // Save as new copies the editor into a new playground and leaves the
+    // original as it was saved.
+    await page
+      .getByLabel("Playground title")
+      .fill("Product listing variant");
+    await page
+      .getByRole("button", { name: "Save as new", exact: true })
+      .click();
+    await expect(
+      page.getByText("Saved playground", { exact: true }),
+    ).toBeVisible();
+    await expect(page).toHaveURL(/\/playgrounds\/[\w-]+$/);
+    expect(page.url()).not.toBe(playgroundUrl);
+    await expect(
+      page.getByRole("link", { name: "Product listing variant", exact: true }),
+    ).toHaveAttribute("aria-current", "page");
+    await page
+      .getByRole("link", { name: "Product listing review", exact: true })
+      .click();
+    await expect(page).toHaveURL(playgroundUrl);
+    await expect(page.getByLabel("Playground title")).toHaveValue(
+      "Product listing review",
+    );
     providerFailure = true;
     await page
       .getByRole("button", { name: "Run questions", exact: true })
