@@ -20,6 +20,7 @@ import type {
   ConnectionInput,
   DecisionInput,
   Playground,
+  ProviderKind,
   ProviderResult,
   Run,
   RunSummary,
@@ -47,7 +48,7 @@ type ConnectionRow = {
   id: string;
   owner_id: string;
   name: string;
-  kind: "typesafe" | "cloudflare";
+  kind: ProviderKind;
   base_url: string;
   account_id: string;
   shared: number;

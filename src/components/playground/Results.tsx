@@ -235,7 +235,16 @@ export function Results({
                               answer.type.slice(1)}
                         </Badge>
                       </div>
-                      {answer.type === "choice" && (
+                      {answer.refused && (
+                        <>
+                          <div className="answer-main">Declined</div>
+                          <p className="result-help">
+                            The model refused this question. Other answers in
+                            the run are unaffected.
+                          </p>
+                        </>
+                      )}
+                      {!answer.refused && answer.type === "choice" && (
                         <>
                           <div className="answer-main">
                             {answer.choice || "No choice returned"}
@@ -254,7 +263,7 @@ export function Results({
                           <p className="result-help">Probability by option</p>
                         </>
                       )}
-                      {answer.type === "score" && (
+                      {!answer.refused && answer.type === "score" && (
                         <>
                           <div className="answer-main numeric">
                             {answer.score?.toLocaleString(undefined, {
@@ -284,7 +293,7 @@ export function Results({
                           </p>
                         </>
                       )}
-                      {answer.type === "noul" && (
+                      {!answer.refused && answer.type === "noul" && (
                         <>
                           <div className="answer-main numeric">
                             {answer.noul === undefined
@@ -299,7 +308,7 @@ export function Results({
                           <p className="result-help">Probability of truth</p>
                         </>
                       )}
-                      {answer.type === "box" && (
+                      {!answer.refused && answer.type === "box" && (
                         <BoxResult answer={answer} questionId={id} run={run} />
                       )}
                       {answer.confidence !== undefined && (

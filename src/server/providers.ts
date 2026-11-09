@@ -5,13 +5,16 @@ import type {
   DecisionInput,
   ImageAttachment,
   JsonValue,
+  ProviderKind,
   ProviderResult,
   Question,
 } from "../lib/domain.ts";
 
-/** System One and Clef wire contracts, verified 2026-11-08 against their official references.
- * https://docs.typesafe.ai/api/system-one
- * https://github.com/cloudflare/cloudflare-docs/blob/production/src/content/workers-ai-models/clef.json
+/** System One, Clef, and OpenAI Decisions wire contracts, verified against their official references.
+ * https://docs.typesafe.ai/api/system-one (2026-11-08)
+ * https://github.com/cloudflare/cloudflare-docs/blob/production/src/content/workers-ai-models/clef.json (2026-11-08)
+ * https://developers.openai.com/api/docs/guides/decisions (2026-11-09)
+ * https://developers.openai.com/api/reference/resources/decisions/methods/create (2026-11-09)
  * Never import this module into client code; the server function owns credentials.
  */
 export type SecretConnection = Connection & { apiKey: string };
@@ -24,6 +27,13 @@ type ProviderOptions = { fetch?: typeof fetch; timeoutMs?: number };
 const MIB = 1024 * 1024;
 const MEDIA_FIELD = "__kimeru_images";
 const CLOUDFLARE_MODELS = ["@cf/cloudflare/clef", "@cf/cloudflare/clef-flash"];
+/** OpenAI's model catalog lists every model, so it cannot tell which ones serve /decisions. */
+const OPENAI_MODELS = ["gpt-6-luna"];
+const DEFAULT_BASE_URLS: Record<ProviderKind, string> = {
+  typesafe: "https://api.typesafe.ai/v1",
+  cloudflare: "https://api.cloudflare.com/client/v4",
+  openai: "https://api.openai.com/v1",
+};
 const dangerousKeys = new Set(["__proto__", "prototype", "constructor"]);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -73,12 +83,7 @@ export function providerEndpoint(
 ): string {
   let url: URL;
   try {
-    url = new URL(
-      connection.baseUrl ||
-        (connection.kind === "cloudflare"
-          ? "https://api.cloudflare.com/client/v4"
-          : "https://api.typesafe.ai/v1"),
-    );
+    url = new URL(connection.baseUrl || DEFAULT_BASE_URLS[connection.kind]);
   } catch {
     return fail("Enter a valid provider base URL.");
   }
@@ -98,6 +103,9 @@ export function providerEndpoint(
     if (!path) path = "/v1";
     path = path.replace(/\/(systemone|models)$/, "");
     url.pathname = `${path}/${model === undefined ? "models" : "systemone"}`;
+  } else if (connection.kind === "openai") {
+    if (!path) path = "/v1";
+    url.pathname = `${path.replace(/\/decisions$/, "")}/decisions`;
   } else {
     if (!/^[a-zA-Z0-9_-]{1,128}$/.test(connection.accountId))
       fail("Cloudflare requires a valid account ID.");
@@ -141,8 +149,9 @@ function validateJSON(value: unknown, depth = 0): void {
 
 function readImage(
   image: ImageAttachment,
-  cloudflare: boolean,
+  kind: ProviderKind,
 ): { data: string; bytes: number } {
+  const cloudflare = kind === "cloudflare";
   if (!image.id || dangerousKeys.has(image.id))
     fail("An image has an invalid identifier.");
   const match =
@@ -170,7 +179,7 @@ function readImage(
     fail(
       "Image dimensions do not match the uploaded file. Re-upload the image.",
     );
-  if (bytes.length > (cloudflare ? 4 : 16) * MIB)
+  if (kind !== "openai" && bytes.length > (cloudflare ? 4 : 16) * MIB)
     fail(
       cloudflare
         ? "Clef images must be at most 4 MiB each."
@@ -186,7 +195,7 @@ function readImage(
   if (cloudflare && image.width * image.height > 16_000_000)
     fail("Clef images must be at most 16 megapixels.");
   if (
-    !cloudflare &&
+    kind === "typesafe" &&
     (Math.min(image.width, image.height) < 280 ||
       Math.max(image.width, image.height) > 1568)
   ) {
@@ -307,6 +316,8 @@ export function buildProviderRequest(
     new Set(input.images.map((image) => image.id)).size !== input.images.length
   )
     fail("Image identifiers must be unique.");
+  if (connection.kind === "openai")
+    return buildOpenAIRequest(connection, input);
   if (cloudflare && input.images.length > 4)
     fail("Clef accepts at most four images per run.");
   const knownJev = /^jev-(\d+)\.(\d+)/.exec(input.model);
@@ -330,7 +341,7 @@ export function buildProviderRequest(
   const assets: Record<string, unknown> = Object.create(null);
   let totalImageBytes = 0;
   const images = input.images.map((image, index) => {
-    const parsed = readImage(image, cloudflare);
+    const parsed = readImage(image, connection.kind);
     totalImageBytes += parsed.bytes;
     const reference = `kimeru-image-${randomUUID()}`;
     if (!cloudflare)
@@ -533,6 +544,247 @@ export function normalizeProviderResult(
   };
 }
 
+/* ---------------------------------------------------------------------------
+ * OpenAI Decisions API (POST /v1/decisions).
+ * Questions are an ordered array keyed by `name`; answers return in the same order.
+ * Kimeru's Noul maps to `predicate`. Box has no OpenAI equivalent.
+ * ------------------------------------------------------------------------- */
+const OPENAI_MAX_QUESTIONS = 400;
+const OPENAI_JSON_LIMITS = { depth: 32, values: 10_000, bytes: 256 * 1024 };
+
+/** `input_json` accepts an object or an array of objects within documented size limits. */
+function openAIStatePart(input: DecisionInput): Record<string, unknown> {
+  const state = readState(input);
+  if (input.stateFormat === "text" || typeof state === "string")
+    return { type: "input_text", text: state };
+  if (
+    Array.isArray(state) &&
+    (!state.length || state.some((item) => !isRecord(item)))
+  )
+    return { type: "input_text", text: JSON.stringify(state) };
+  let values = 0;
+  let maxDepth = 0;
+  const walk = (value: unknown, depth: number) => {
+    values++;
+    if (Array.isArray(value) || isRecord(value)) {
+      maxDepth = Math.max(maxDepth, depth);
+      Object.values(value).forEach((child) => walk(child, depth + 1));
+    }
+  };
+  walk(state, 1);
+  if (
+    maxDepth > OPENAI_JSON_LIMITS.depth ||
+    values > OPENAI_JSON_LIMITS.values ||
+    Buffer.byteLength(JSON.stringify(state)) > OPENAI_JSON_LIMITS.bytes
+  )
+    fail(
+      "JSON state exceeds OpenAI's structured input limits (32 levels, 10,000 values, 256 KiB). Reduce it or switch the state format to Text.",
+    );
+  return { type: "input_json", data: state };
+}
+
+function openAIQuestion(question: Question): Record<string, unknown> {
+  if (!question.id.trim() || dangerousKeys.has(question.id))
+    fail("Each question needs a valid unique identifier.");
+  if (!question.instructions.trim())
+    fail(`Question "${question.id}" needs instructions.`);
+  const base = { name: question.id, instructions: question.instructions };
+  if (question.type === "choice") {
+    const entries = Object.entries(question.criteria);
+    if (
+      entries.length < 2 ||
+      entries.length > 255 ||
+      entries.some(([key, val]) => !key.trim() || typeof val !== "string")
+    )
+      fail(`Choice "${question.id}" needs 2–255 named criteria.`);
+    return {
+      type: "choice",
+      ...base,
+      choices: entries.map(([value, description]) =>
+        description.trim() ? { value, description } : { value },
+      ),
+    };
+  }
+  if (question.type === "score") {
+    if (
+      question.criteria.length < 2 ||
+      question.criteria.length > 10 ||
+      question.criteria.some((level) => !level.trim())
+    )
+      fail(`Score "${question.id}" needs 2–10 ordered level descriptions.`);
+    return {
+      type: "score",
+      ...base,
+      levels: question.criteria.map((label) => ({ label })),
+    };
+  }
+  if (question.type === "noul") {
+    const guidance = [
+      question.criteria?.true?.trim() &&
+        `True when: ${question.criteria.true.trim()}`,
+      question.criteria?.false?.trim() &&
+        `False when: ${question.criteria.false.trim()}`,
+    ].filter(Boolean);
+    return {
+      type: "predicate",
+      ...base,
+      instructions: guidance.length
+        ? `${question.instructions}\n\n${guidance.join("\n")}`
+        : question.instructions,
+    };
+  }
+  return fail(
+    "OpenAI Decisions does not support Box questions. Choose a TypeSafe model that supports Box, or remove the Box questions.",
+  );
+}
+
+function buildOpenAIRequest(
+  connection: SecretConnection,
+  input: DecisionInput,
+): ProviderRequest {
+  if (input.questions.length > OPENAI_MAX_QUESTIONS)
+    fail(
+      `OpenAI Decisions accepts at most ${OPENAI_MAX_QUESTIONS} questions per run.`,
+    );
+  const questions = input.questions.map(openAIQuestion);
+  const content: Record<string, unknown>[] = [openAIStatePart(input)];
+  input.images.forEach((image, index) => {
+    readImage(image, "openai");
+    content.push(
+      { type: "input_text", text: `Image ${index + 1}: ${image.name}` },
+      { type: "input_image", image_url: image.dataUrl, detail: "auto" },
+    );
+  });
+  return {
+    url: providerEndpoint(connection, input.model),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${connection.apiKey}`,
+    },
+    body: {
+      model: input.model,
+      input: [{ role: "user", content }],
+      questions,
+    },
+  };
+}
+
+/** OpenAI reports distributions as `[{ value, probability }]`; omitted options count as zero. */
+function openAIProbabilities(
+  value: unknown,
+  keys: string[],
+  id: string,
+): Record<string, number> {
+  if (!Array.isArray(value))
+    fail(`Provider returned invalid probabilities for "${id}".`);
+  const record: Record<string, unknown> = Object.fromEntries(
+    keys.map((key) => [key, 0]),
+  );
+  for (const entry of value) {
+    if (
+      !isRecord(entry) ||
+      !["string", "number"].includes(typeof entry.value) ||
+      dangerousKeys.has(String(entry.value))
+    )
+      fail(`Provider returned invalid probabilities for "${id}".`);
+    record[String(entry.value)] = entry.probability;
+  }
+  return readProbabilities(record, keys, id);
+}
+
+export function normalizeOpenAIResult(
+  raw: unknown,
+  input: DecisionInput,
+): ProviderResult {
+  assertJsonValue(raw);
+  if (!isRecord(raw) || !Array.isArray(raw.answers))
+    fail(
+      "Provider response did not contain an OpenAI Decisions answers array.",
+    );
+  if (raw.answers.length !== input.questions.length)
+    fail(
+      `Provider returned ${raw.answers.length} answers for ${input.questions.length} questions.`,
+    );
+  const answers: Record<string, Answer> = Object.create(null);
+  input.questions.forEach((question, index) => {
+    const value = (raw.answers as unknown[])[index];
+    const wireType = question.type === "noul" ? "predicate" : question.type;
+    if (
+      !isRecord(value) ||
+      (value.name != null && value.name !== question.id) ||
+      (value.type !== wireType && value.type !== "refusal")
+    )
+      fail(
+        `Provider returned a missing or mismatched answer for "${question.id}".`,
+      );
+    const answer: Answer = { type: question.type };
+    if (value.type === "refusal") {
+      answer.refused = true;
+    } else if (question.type === "noul") {
+      if (!unit(value.probability))
+        fail(
+          `Provider returned an invalid truth probability for "${question.id}".`,
+        );
+      answer.noul = value.probability;
+    } else if (question.type === "choice") {
+      if (!finite(value.confidence))
+        fail(`Provider returned invalid confidence for "${question.id}".`);
+      if (
+        typeof value.choice !== "string" ||
+        !Object.hasOwn(question.criteria, value.choice)
+      )
+        fail(`Provider returned an unknown choice for "${question.id}".`);
+      answer.choice = value.choice;
+      answer.confidence = value.confidence;
+      answer.probabilities = openAIProbabilities(
+        value.probabilities,
+        Object.keys(question.criteria),
+        question.id,
+      );
+      if (
+        answer.probabilities[value.choice] + 0.02 <
+        Math.max(...Object.values(answer.probabilities))
+      )
+        fail(
+          `Provider returned a choice inconsistent with its probabilities for "${question.id}".`,
+        );
+    } else if (question.type === "score") {
+      if (!finite(value.confidence))
+        fail(`Provider returned invalid confidence for "${question.id}".`);
+      if (
+        !finite(value.score) ||
+        value.score < 0 ||
+        value.score > question.criteria.length - 1
+      )
+        fail(`Provider returned an out-of-range score for "${question.id}".`);
+      answer.score = value.score;
+      answer.confidence = value.confidence;
+      answer.probabilities = openAIProbabilities(
+        value.probabilities,
+        question.criteria.map((_, level) => String(level)),
+        question.id,
+      );
+      const weighted = Object.entries(answer.probabilities).reduce(
+        (sum, [level, probability]) => sum + Number(level) * probability,
+        0,
+      );
+      if (Math.abs(value.score - weighted) > 0.02)
+        fail(
+          `Provider returned a score inconsistent with its probabilities for "${question.id}".`,
+        );
+      answer.legend = [...question.criteria];
+    } else {
+      fail(`OpenAI Decisions does not support Box questions.`);
+    }
+    answers[question.id] = answer;
+  });
+  return {
+    model: typeof raw.model === "string" ? raw.model : input.model,
+    answers,
+    raw,
+  };
+}
+
 function redactSecret(value: JsonValue, secret: string): JsonValue {
   if (typeof value === "string") return value.split(secret).join("[redacted]");
   if (Array.isArray(value))
@@ -646,6 +898,7 @@ export async function runProvider(
     options,
   );
   const safe = redactSecret(raw, connection.apiKey);
+  if (connection.kind === "openai") return normalizeOpenAIResult(safe, input);
   return normalizeProviderResult(safe, input, connection.kind === "cloudflare");
 }
 
@@ -654,6 +907,7 @@ export async function discoverModels(
   options: ProviderOptions = {},
 ): Promise<string[]> {
   if (connection.kind === "cloudflare") return [...CLOUDFLARE_MODELS];
+  if (connection.kind === "openai") return [...OPENAI_MODELS];
   if (!connection.apiKey.trim()) fail("This connection has no API key.");
   const response = await fetchJSON(
     providerEndpoint(connection),

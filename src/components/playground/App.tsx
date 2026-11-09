@@ -39,7 +39,7 @@ import { Alert, AlertDescription } from "#/components/ui/alert";
 import { Field, FieldGroup, FieldLabel } from "#/components/ui/field";
 import { ToggleGroup, ToggleGroupItem } from "#/components/ui/toggle-group";
 import { cn } from "#/lib/utils";
-import { DEFAULT_MODELS } from "#/lib/domain";
+import { DEFAULT_MODELS, PROVIDERS, supportsBox } from "#/lib/domain";
 import type { Bootstrap, DecisionInput, Run, Workspace } from "#/lib/domain";
 import {
   getBootstrap,
@@ -58,7 +58,13 @@ import { Results } from "./Results";
 import { RunHistory } from "./RunHistory";
 import { Connections } from "./Connections";
 import { Administration, PasswordDialog } from "./Administration";
-import { Modal, Picker, errorMessage, downloadJson } from "./shared";
+import {
+  Modal,
+  Picker,
+  ProviderLogo,
+  errorMessage,
+  downloadJson,
+} from "./shared";
 import { prepareImage } from "./images";
 import { ThemeToggle } from "./ThemeToggle";
 import {
@@ -229,8 +235,15 @@ export function App({
     ]),
   ).filter(Boolean);
   const incompatible =
-    connection?.kind === "cloudflare" &&
+    !!connection &&
+    !supportsBox(connection.kind) &&
     draft.questions.some((question) => question.type === "box");
+  const boxUnsupportedBy =
+    connection?.kind === "cloudflare"
+      ? "Clef"
+      : connection
+        ? PROVIDERS[connection.kind].name
+        : "";
   let validJson = true;
   if (draft.stateFormat === "json") {
     try {
@@ -338,7 +351,7 @@ export function App({
     }
     if (incompatible) {
       toast.error(
-        "Clef does not support Box. Choose a supporting model or remove the Box question.",
+        `${boxUnsupportedBy} does not support Box. Choose a supporting model or remove the Box question.`,
       );
       return;
     }
@@ -835,13 +848,7 @@ export function App({
             </div>
             <div className="connection-toolbar">
               {connection && (
-                <img
-                  className="provider-logo"
-                  src={`/brand/${connection.kind === "typesafe" ? "typesafe.png" : "cloudflare.svg"}`}
-                  alt={
-                    connection.kind === "typesafe" ? "TypeSafe" : "Cloudflare"
-                  }
-                />
+                <ProviderLogo kind={connection.kind} />
               )}
               <div className="connection-picker">
                 <Picker
@@ -936,9 +943,9 @@ export function App({
               <div className="workspace-notice">
                 <Alert>
                   <AlertDescription>
-                    Clef accepts images but does not support Box. Choose a
-                    TypeSafe model that supports Box, or remove the Box
-                    question.
+                    {boxUnsupportedBy} accepts images but does not support Box.
+                    Choose a TypeSafe model that supports Box, or remove the
+                    Box question.
                   </AlertDescription>
                 </Alert>
               </div>

@@ -5,6 +5,7 @@ import type { DecisionInput, ImageAttachment } from "../lib/domain.ts";
 import {
   buildProviderRequest,
   discoverModels,
+  normalizeOpenAIResult,
   normalizeProviderResult,
   providerEndpoint,
   runProvider,
@@ -504,5 +505,222 @@ test("slow providers are aborted and oversized responses are rejected before dis
         ),
       }),
     /4 MiB/,
+  );
+});
+
+const openai: SecretConnection = {
+  ...connection,
+  kind: "openai",
+  baseUrl: "https://api.openai.com/v1",
+};
+const openAIInput: DecisionInput = { ...input, model: "gpt-6-luna" };
+function openAIRawResult() {
+  return {
+    model: "gpt-6-luna",
+    answers: [
+      {
+        type: "choice",
+        name: "team",
+        choice: "billing",
+        probabilities: [
+          { value: "billing", probability: 0.8 },
+          { value: "technical", probability: 0.2 },
+        ],
+        confidence: 0.93,
+      },
+      {
+        type: "score",
+        name: "urgency",
+        score: 1.1,
+        probabilities: [
+          { value: 0, label: "Low", probability: 0.1 },
+          { value: 1, label: "Medium", probability: 0.7 },
+          { value: 2, label: "High", probability: 0.2 },
+        ],
+        confidence: 0.4,
+      },
+      { type: "predicate", name: "refund", probability: 0.9 },
+    ],
+    usage: {
+      input_tokens: 120,
+      input_tokens_details: { cached_tokens: 0, cache_write_tokens: 0 },
+      output_tokens: 3,
+      output_tokens_details: { reasoning_tokens: 0 },
+      total_tokens: 123,
+    },
+  };
+}
+test("OpenAI requests map Kimeru questions to the Decisions wire contract", () => {
+  const request = buildProviderRequest(openai, openAIInput);
+  assert.equal(request.url, "https://api.openai.com/v1/decisions");
+  assert.equal(request.headers.Authorization, `Bearer ${openai.apiKey}`);
+  assert.equal(request.headers["TypeSafe-Danger-Zone-Images"], undefined);
+  assert.deepEqual(request.body, {
+    model: "gpt-6-luna",
+    input: [
+      {
+        role: "user",
+        content: [{ type: "input_json", data: { ticket: "Payment failed" } }],
+      },
+    ],
+    questions: [
+      {
+        type: "choice",
+        name: "team",
+        instructions: "Which team?",
+        choices: [
+          { value: "billing", description: "Payment issues" },
+          { value: "technical", description: "Software problems" },
+        ],
+      },
+      {
+        type: "score",
+        name: "urgency",
+        instructions: "How urgent?",
+        levels: [{ label: "Low" }, { label: "Medium" }, { label: "High" }],
+      },
+      {
+        type: "predicate",
+        name: "refund",
+        instructions:
+          "Is a refund needed?\n\nTrue when: Refund requested\nFalse when: No refund requested",
+      },
+    ],
+  });
+});
+test("OpenAI state, images, endpoints, and Box limits", () => {
+  const text = buildProviderRequest(openai, {
+    ...openAIInput,
+    stateFormat: "text",
+    state: "Customer was double charged",
+    images: [image],
+  });
+  assert.deepEqual((text.body.input as { content: unknown[] }[])[0].content, [
+    { type: "input_text", text: "Customer was double charged" },
+    { type: "input_text", text: "Image 1: product.jpg" },
+    { type: "input_image", image_url: image.dataUrl, detail: "auto" },
+  ]);
+  const primitives = buildProviderRequest(openai, {
+    ...openAIInput,
+    state: "[1,2,3]",
+  });
+  assert.deepEqual(
+    (primitives.body.input as { content: unknown[] }[])[0].content,
+    [{ type: "input_text", text: "[1,2,3]" }],
+  );
+  const deep = JSON.stringify(
+    Array.from({ length: 40 }).reduce<unknown>((value) => ({ a: value }), 1),
+  );
+  assert.throws(
+    () => buildProviderRequest(openai, { ...openAIInput, state: deep }),
+    /structured input limits/,
+  );
+  assert.throws(
+    () =>
+      buildProviderRequest(openai, {
+        ...openAIInput,
+        images: [image],
+        questions: [
+          {
+            id: "where",
+            type: "box",
+            instructions: "Find it",
+            targetImageId: image.id,
+          },
+        ],
+      }),
+    /does not support Box/,
+  );
+  assert.equal(
+    providerEndpoint(
+      { ...openai, baseUrl: "https://proxy.example/openai/v1/decisions/" },
+      "gpt-6-luna",
+    ),
+    "https://proxy.example/openai/v1/decisions",
+  );
+  assert.equal(
+    providerEndpoint({ ...openai, baseUrl: "" }, "gpt-6-luna"),
+    "https://api.openai.com/v1/decisions",
+  );
+});
+test("OpenAI results normalize ordered answers, refusals, and sparse distributions", () => {
+  const result = normalizeOpenAIResult(openAIRawResult(), openAIInput);
+  assert.deepEqual(result.answers.team, {
+    type: "choice",
+    choice: "billing",
+    confidence: 0.93,
+    probabilities: { billing: 0.8, technical: 0.2 },
+  });
+  assert.deepEqual(result.answers.urgency, {
+    type: "score",
+    score: 1.1,
+    confidence: 0.4,
+    probabilities: { "0": 0.1, "1": 0.7, "2": 0.2 },
+    legend: ["Low", "Medium", "High"],
+  });
+  assert.deepEqual(result.answers.refund, { type: "noul", noul: 0.9 });
+  assert.equal(result.model, "gpt-6-luna");
+
+  const refused = openAIRawResult();
+  refused.answers[2] = { type: "refusal", name: "refund" } as never;
+  refused.answers[0].probabilities = [{ value: "billing", probability: 1 }];
+  const partial = normalizeOpenAIResult(refused, openAIInput);
+  assert.deepEqual(partial.answers.refund, { type: "noul", refused: true });
+  assert.deepEqual(partial.answers.team.probabilities, {
+    billing: 1,
+    technical: 0,
+  });
+
+  const renamed = openAIRawResult();
+  renamed.answers[0].name = "other";
+  assert.throws(
+    () => normalizeOpenAIResult(renamed, openAIInput),
+    /mismatched answer for "team"/,
+  );
+  const short = openAIRawResult();
+  short.answers.pop();
+  assert.throws(
+    () => normalizeOpenAIResult(short, openAIInput),
+    /2 answers for 3 questions/,
+  );
+  const unknown = openAIRawResult();
+  unknown.answers[0] = {
+    ...unknown.answers[0],
+    probabilities: [
+      { value: "billing", probability: 0.8 },
+      { value: "technical", probability: 0.2 },
+      { value: "shipping", probability: 0 },
+    ],
+  } as never;
+  assert.throws(
+    () => normalizeOpenAIResult(unknown, openAIInput),
+    /unexpected probability options/,
+  );
+  assert.throws(
+    () => normalizeProviderResult(openAIRawResult(), input),
+    /System One answers object/,
+  );
+});
+test("OpenAI transport posts to /decisions and model discovery never calls the API", async () => {
+  const response = await runProvider(openai, openAIInput, {
+    fetch: mockFetch((url, init) => {
+      assert.equal(url, "https://api.openai.com/v1/decisions");
+      assert.equal(init.method, "POST");
+      assert.equal(init.redirect, "error");
+      assert.equal(
+        (init.headers as Record<string, string>).Authorization,
+        `Bearer ${openai.apiKey}`,
+      );
+      return Response.json(openAIRawResult());
+    }),
+  });
+  assert.equal(response.answers.team.choice, "billing");
+  assert.deepEqual(
+    await discoverModels(openai, {
+      fetch: mockFetch(() => {
+        throw new Error("Must not list every OpenAI model");
+      }),
+    }),
+    ["gpt-6-luna"],
   );
 });

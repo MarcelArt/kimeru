@@ -1,4 +1,4 @@
-export type ProviderKind = "typesafe" | "cloudflare";
+export type ProviderKind = "typesafe" | "cloudflare" | "openai";
 export type QuestionType = "choice" | "score" | "noul" | "box";
 export type User = {
   id: string;
@@ -65,6 +65,8 @@ export type Answer = {
   noul?: number;
   box?: { top: number; bottom: number; left: number; right: number };
   targetImageId?: string;
+  /** The provider declined this question; other answers in the run are unaffected. */
+  refused?: boolean;
 };
 export type JsonValue =
   string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
@@ -98,7 +100,32 @@ export type Bootstrap = { needsSetup: boolean; user: User | null };
 export const DEFAULT_MODELS: Record<ProviderKind, string[]> = {
   typesafe: ["jev-latest", "jev-1.14.0"],
   cloudflare: ["@cf/cloudflare/clef", "@cf/cloudflare/clef-flash"],
+  openai: ["gpt-6-luna"],
 };
+export const PROVIDERS: Record<
+  ProviderKind,
+  { name: string; description: string; logo?: string; baseUrl: string }
+> = {
+  typesafe: {
+    name: "TypeSafe",
+    description: "System One compatible",
+    logo: "/brand/typesafe.png",
+    baseUrl: "https://api.typesafe.ai",
+  },
+  cloudflare: {
+    name: "Cloudflare",
+    description: "Workers AI",
+    logo: "/brand/cloudflare.svg",
+    baseUrl: "https://api.cloudflare.com/client/v4",
+  },
+  openai: {
+    name: "OpenAI",
+    description: "Decisions API",
+    baseUrl: "https://api.openai.com/v1",
+  },
+};
+/** Providers whose decision API has no region (Box) question type. */
+export const supportsBox = (kind: ProviderKind) => kind === "typesafe";
 export const QUESTION_LABELS: Record<QuestionType, string> = {
   choice: "Choice",
   score: "Score",

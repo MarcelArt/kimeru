@@ -84,7 +84,7 @@ Open [localhost:3000](http://localhost:3000) and follow [first-time setup](#firs
 ### First-time setup
 
 1. Open your configured URL (default: **http://localhost:3000**). There are no default credentials: create the first administrator account with a password of at least 12 characters.
-2. Open **Connections** and add your TypeSafe or Cloudflare provider URL and API key. Cloudflare also needs your account ID. Provider credentials are entered in the application, not in the Docker command.
+2. Open **Connections** and add your TypeSafe, Cloudflare, or OpenAI provider URL and API key. Cloudflare also needs your account ID. Provider credentials are entered in the application, not in the Docker command.
 3. Open **Playground**, select your connection and model, enter state and questions, and run them. **Load example inputs** provides an editable starting point; results require a real provider request and may incur provider charges.
 4. To give other people access, create their accounts under **Administration**. Public registration closes after the first administrator is created.
 
@@ -127,10 +127,13 @@ Compose replaces the container when the image changes and reuses the named volum
 | --- | --- | --- | --- |
 | TypeSafe SystemOne | `https://api.typesafe.ai/v1` | TypeSafe API key | Discover available Jev models; Choice, Score, Noul, and Box where supported by the selected model |
 | Cloudflare Workers AI | `https://api.cloudflare.com/client/v4` | Cloudflare account ID and API token with Workers AI access | `@cf/cloudflare/clef` and `@cf/cloudflare/clef-flash`; Choice, Score, and Noul |
+| OpenAI Decisions | `https://api.openai.com/v1` | OpenAI API key | `gpt-6-luna`; Choice, Score, and Noul (sent as OpenAI `predicate`) |
 
-Host-only URLs automatically receive `/v1` for TypeSafe or `/client/v4` for Cloudflare. Custom base URLs are supported for compatible services and gateways. They must implement the corresponding decision API contract; an OpenAI-compatible chat endpoint alone is insufficient. Provider requests originate from the Kimeru server. Redirects are rejected to avoid forwarding credentials to another endpoint.
+Host-only URLs automatically receive `/v1` for TypeSafe and OpenAI, or `/client/v4` for Cloudflare. Custom base URLs are supported for compatible services and gateways. They must implement the corresponding decision API contract; an OpenAI-compatible chat endpoint alone is insufficient. Provider requests originate from the Kimeru server. Redirects are rejected to avoid forwarding credentials to another endpoint.
 
 **Clef does not support Box.** Its adapter accepts at most 64 questions and four images per run, with limits of 4 MiB per decoded image and 8 MiB combined. For named Jev versions, image inputs require Jev 1.13 or newer and Box requires Jev 1.14 or newer. Kimeru sends TypeSafe's experimental image header for image and Box requests; availability still depends on the provider and model.
+
+**OpenAI Decisions does not support Box.** Kimeru sends JSON state as structured `input_json` (at most 32 levels, 10,000 values, and 256 KiB; switch the state format to Text for larger state) and attaches images as `input_image` data URLs. Noul true/false criteria are appended to the question instructions. OpenAI may decline individual questions; those answers are marked **Declined** while the rest of the run still succeeds. Model discovery returns `gpt-6-luna` without calling OpenAI, because its model catalog does not indicate Decisions support; enter another model name manually if needed.
 
 The image picker accepts PNG, JPEG, and WebP files up to 16 MiB. It corrects orientation, converts to JPEG on a white background, and resizes to provider-compatible dimensions between 280 and 1568 pixels per side. Very panoramic images must be cropped first. Box questions explicitly target one attachment, and the result overlays the returned region on that run's saved image.
 

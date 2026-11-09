@@ -14,7 +14,18 @@ import {
   DialogTitle,
 } from "#/components/ui/dialog";
 import type { ReactNode } from "react";
+import { Sparkles } from "lucide-react";
 import { cn } from "#/lib/utils";
+import { PROVIDERS, type ProviderKind } from "#/lib/domain";
+
+export function ProviderLogo({ kind }: { kind: ProviderKind }) {
+  const provider = PROVIDERS[kind];
+  return provider.logo ? (
+    <img className="provider-logo" src={provider.logo} alt={provider.name} />
+  ) : (
+    <Sparkles className="provider-logo" role="img" aria-label={provider.name} />
+  );
+}
 
 export function Picker({
   value,

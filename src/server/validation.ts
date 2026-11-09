@@ -18,7 +18,7 @@ export const connectionSchema = z
   .object({
     id: z.string().min(1).max(100).optional(),
     name: z.string().trim().min(1).max(100),
-    kind: z.enum(["typesafe", "cloudflare"]),
+    kind: z.enum(["typesafe", "cloudflare", "openai"]),
     baseUrl: z
       .url()
       .max(2048)

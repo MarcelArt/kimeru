@@ -32,7 +32,8 @@ import type {
   ProviderKind,
   User,
 } from "#/lib/domain";
-import { Modal, Picker, errorMessage } from "./shared";
+import { PROVIDERS } from "#/lib/domain";
+import { Modal, Picker, ProviderLogo, errorMessage } from "./shared";
 
 const newConnection = (): ConnectionInput => ({
   name: "",
@@ -120,20 +121,10 @@ export function Connections({
           {connections.map((connection) => (
             <article className="connection-card" key={connection.id}>
               <div className="connection-card-heading">
-                <img
-                  className="provider-logo"
-                  src={`/brand/${connection.kind === "typesafe" ? "typesafe.png" : "cloudflare.svg"}`}
-                  alt={
-                    connection.kind === "typesafe" ? "TypeSafe" : "Cloudflare"
-                  }
-                />
+                <ProviderLogo kind={connection.kind} />
                 <div>
                   <h2>{connection.name}</h2>
-                  <span>
-                    {connection.kind === "typesafe"
-                      ? "System One compatible"
-                      : "Workers AI"}
-                  </span>
+                  <span>{PROVIDERS[connection.kind].description}</span>
                 </div>
                 <Badge variant="outline">
                   {connection.shared ? <Users /> : <LockKeyhole />}
@@ -209,10 +200,7 @@ export function Connections({
                   onChange={(value) =>
                     update({
                       kind: value as ProviderKind,
-                      baseUrl:
-                        value === "typesafe"
-                          ? "https://api.typesafe.ai"
-                          : "https://api.cloudflare.com/client/v4",
+                      baseUrl: PROVIDERS[value as ProviderKind].baseUrl,
                     })
                   }
                   options={[
@@ -221,6 +209,7 @@ export function Connections({
                       label: "TypeSafe / System One compatible",
                     },
                     { value: "cloudflare", label: "Cloudflare Workers AI" },
+                    { value: "openai", label: "OpenAI Decisions" },
                   ]}
                 />
               </Field>
@@ -236,7 +225,9 @@ export function Connections({
                 <FieldDescription>
                   {editing.kind === "typesafe"
                     ? "Use your TypeSafe or System One compatible server URL."
-                    : "The Cloudflare API base URL, including /client/v4."}
+                    : editing.kind === "openai"
+                      ? "The OpenAI API base URL, including /v1."
+                      : "The Cloudflare API base URL, including /client/v4."}
                 </FieldDescription>
               </Field>
               {editing.kind === "cloudflare" && (
